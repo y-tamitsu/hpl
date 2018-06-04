@@ -1,0 +1,67 @@
+﻿@model hpl.Models.userModel
+
+@{
+    ViewBag.Title = "AcDetails";
+}
+
+<h2>出品情報詳細</h2>
+
+<dl class="dl-horizontal">
+    <dt>
+        @Html.DisplayNameFor(model => model.id)
+    </dt>
+    <dd>
+        ： 　　 @ViewBag.id
+    </dd>
+</dl>
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.title)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.title)：@ViewBag.titl
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.detail)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.detail)：@ViewBag.detail
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.money)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.money)：@ViewBag.money
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.price)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.price)：@ViewBag.price
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.time)
+        </dt>
+        <dd>
+            ：@ViewBag.time
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.lasttime)
+        </dt>
+        <dd>
+            ：@ViewBag.lasttime
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.image)
+        </dt>
+        <dd>
+            <img src="data:image/jpg;base64,@Model.image" alt="image" style="max-width:100%;height:370px;" />
+        </dd>
+    </dl>
+    <div class="col-md-offset-2 col-md-10">
+        <input type="button" value="戻る" onclick="location.href='http://localhost:49405/Home/AcList'" class="btn btn-default" />
+    </div>
+</div>

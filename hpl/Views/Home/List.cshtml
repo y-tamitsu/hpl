@@ -1,0 +1,262 @@
+﻿@model IEnumerable<hpl.Models.userModel>
+
+@{
+    ViewBag.Title = "List";
+}
+
+<h2>リスト</h2>
+
+@using (Html.BeginForm())
+{
+    <p>
+        <div class="d1" style="">
+            <input type="radio" name="select" value="and" checked="@Session["and"]">AND
+            <input type="radio" name="select" value="or" checked="@Session["or"]">OR
+        </div>
+    </p>
+    <p>
+        <div class="form" style="position:relative;">
+            <select name="example1">
+                <option value="id" @Session["selid"]> ID </option>
+                <option value="name" @Session["selna"]> 氏名 </option>
+                <option value="email" @Session["selem"]> アドレス </option>
+            </select>
+            <input type="text" name="serch1" id="serch1" required value="@Session["serch1"]" placeholder="serch">
+            <input type="submit" value="検索" name="serch" class="btn btn-default" /> @ViewBag.error
+        </div>
+        @*更新*@
+        <div class="translate" style="position:relative;float:right">
+            <button type="button"><img src="~/image/translate.png" alt="translate" width="20" height="22" onclick="location.href='http://localhost:49405/Home/List'" /></button>
+        </div>
+
+        <div id="div1" style="visibility:hidden;">
+            <select name="example2">
+                <option value="id" @Session["selid2"]> ID </option>
+                <option value="name" @Session["selna2"]> 氏名 </option>
+                <option value="email" @Session["selem2"]> アドレス </option>
+            </select>
+            <input type="text" name="serch2" id="serch2" value="@Session["serch2"]" placeholder="serch">
+        </div>
+    </p>
+}
+<p>
+    <div class="d3" style="margin-right:5px;position:relative;float:left">
+        <input type="button" value="+" id="pull" onclick="Click1(); Pmc();" class="btn btn-default " />
+        <script>
+            function Click1() {
+                if (document.all.div1.style.visibility == "hidden") {
+
+                    document.all.div1.style.visibility = "visible"
+                } else {
+                    document.all.div1.style.visibility = "hidden"
+                }
+            }
+            function Pmc() {
+                if (document.getElementById('pull').value == "+") {
+                    document.getElementById('pull').value = "-"
+                } else {
+                    document.getElementById('pull').value = "+"
+                }
+            }
+        </script>
+    </div>
+    @using (Html.BeginForm("Import", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div class="csvin" style="margin-left:5px;position:relative;float:right">
+
+            <button type="submit"><img src="~/image/input.png" alt="csvin" width="20" height="22" /></button>
+            <input type="file" style="margin-left:5px;position:relative;float:right">
+
+
+            @*<button type="button"><img src="~/image/input.png" alt="csvin" width="20" height="22" onmousedown="insg()" /></button>*@
+
+            @*<input type="file" style="margin-left:5px;position:relative;float:right" name="up" id="up" value="" enctype="multipart/form-data">*@
+            @*<script>
+                    function insg() {
+                        if (!confirm('本当にインポートしますか？')) {
+                            return false;
+                        }
+                        else {
+                            /*　OKの時の処理 */
+                            location.href = 'http://localhost:49405/Home/Import';
+                        }
+                    }
+                </script>*@
+            <span class="csvi">CSVファイルインポート</span>
+        </div>
+    }
+    <style type="text/css">
+        .csvin {
+            position: relative;
+        }
+
+            .csvin:hover .csvi {
+                display: inline;
+            }
+
+        .csvi {
+            position: absolute;
+            display: none;
+            padding: 2px;
+            background-color: rgba(102, 102, 255, 0.50);
+            width: 130px;
+            left: 30%;
+            top: 100%;
+            margin-top: 12px;
+            font-size: 80%;
+        }
+
+            .csvi:after {
+                border-bottom: 12px solid rgba(102, 102, 255, 0.50);
+                border-left: 10px solid transparent;
+                border-right: 10px solid transparent;
+                top: -12px;
+                left: 5%;
+                content: "";
+                position: absolute;
+            }
+    </style>
+
+    <div class="csvout" style="margin-left:5px;position:relative;float:right">
+        <button type="button"><img src="~/image/output.png" alt="csvout" width="20" height="22" onmousedown="exsg()" /></button>
+        <script language="JavaScript">
+            function exsg() {
+                if (!confirm('本当にエクスポートしますか？')) {
+                    return false;
+                } else {
+                    /*　OKの時の処理 */
+                    location.href = 'http://localhost:49405/Home/Export';
+                }
+            }
+        </script>
+        <span class="csvo">CSVファイルエクスポート</span>
+    </div>
+    <style type="text/css">
+        .csvout {
+            position: relative;
+        }
+
+            .csvout:hover .csvo {
+                display: inline;
+            }
+
+        .csvo {
+            position: absolute;
+            display: none;
+            padding: 2px;
+            background-color: rgba(102, 102, 255, 0.50);
+            width: 140px;
+            left: 30%;
+            top: 100%;
+            margin-top: 12px;
+            font-size: 80%;
+        }
+
+            .csvo:after {
+                border-bottom: 12px solid rgba(102, 102, 255, 0.50);
+                border-left: 10px solid transparent;
+                border-right: 10px solid transparent;
+                top: -12px;
+                left: 5%;
+                content: "";
+                position: absolute;
+            }
+    </style>
+
+
+
+
+</p>
+
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
+    <script>
+        $(function () {
+            var page = 0;
+            function draw() {
+                $('#page').html(page + 1);
+                $('tr').hide();
+                $('tr:first,tr:gt(' + page * 10 + '):lt(10)').show();
+            }
+            $('#first').click(function () {
+                page = 0;;
+                draw();
+            });
+            $('#last').click(function () {
+                page = Math.ceil($("#table tr").size() / 10) - 1;
+                draw();
+            });
+            $('#prev').click(function () {
+                if (page > 0) {
+                    page--;
+                    draw();
+                }
+            });
+            $('#next').click(function () {
+                if (page < ($('tr').size() - 1) / 10 - 1) {
+                    page++;
+                    draw();
+                }
+            });
+            draw();
+        });
+    </script>
+    <style>
+        #first, #prev, #next, #last {
+            color: black;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <span id="first">＜＜</span> <span id="prev">＜前</span> <span id="page"></span> <span id="next">次＞</span> <span id="last">＞＞</span>
+    <table class="table" id="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.password)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.mail)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.remark)
+            </th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.password)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.mail)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.remark)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.id, name = item.name, password = item.password, mail = item.mail, remark = item.remark }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.id, name = item.name, password = item.password, mail = item.mail, remark = item.remark }) |
+                    @Html.ActionLink("Create New", "Registration", new { id = item.id, name = item.name, password = item.password, mail = item.mail, remark = item.remark })
+                </td>
+            </tr>
+        }
+    </table>
+</body>
+</html>

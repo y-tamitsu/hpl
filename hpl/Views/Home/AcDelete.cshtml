@@ -1,0 +1,70 @@
+﻿@model hpl.Models.userModel
+
+@{
+    ViewBag.Title = "AcDelete";
+}
+
+<h2>AcDelete</h2>
+
+<h3>本当に削除しますか？</h3>
+
+<dl class="dl-horizontal">
+    <dt>
+        @Html.DisplayNameFor(model => model.id)
+    </dt>
+    <dd>
+        ：@ViewBag.id
+    </dd>
+    <dt>
+        @Html.DisplayNameFor(model => model.title)
+    </dt>
+    <dd>
+        @Html.DisplayFor(model => model.title)：@ViewBag.titl
+    </dd>
+    <dt>
+        @Html.DisplayNameFor(model => model.detail)
+    </dt>
+    <dd>
+        @Html.DisplayFor(model => model.detail)：@ViewBag.detail
+    </dd>
+    <dt>
+        @Html.DisplayNameFor(model => model.money)
+    </dt>
+    <dd>
+        @Html.DisplayFor(model => model.money)：@ViewBag.money
+    </dd>
+    <dt>
+        @Html.DisplayNameFor(model => model.price)
+    </dt>
+    <dd>
+        @Html.DisplayFor(model => model.price)：@ViewBag.price
+    </dd>
+    <dt>
+        @Html.DisplayNameFor(model => model.time)
+    </dt>
+    <dd>
+        ：@ViewBag.time
+    </dd>
+    <dt>
+        @Html.DisplayNameFor(model => model.image)
+    </dt>
+    <dt>
+        @Html.DisplayNameFor(model => model.lasttime)
+    </dt>
+    <dd>
+        ：@ViewBag.lasttime
+    </dd>
+    <dd>
+        <img src="data:image/jpg;base64,@Model.image" alt="image" style="max-width:100%;height:370px;" />
+    </dd>
+</dl>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div style="padding:unset;">
+        <input type="submit" value="YES" class="btn btn-default" />
+        <input type="button" value="NO" onclick="location.href='http://localhost:49405/Home/AcList'" class="btn btn-default" />
+    </div>
+}
+

@@ -1,0 +1,319 @@
+﻿@model IEnumerable<hpl.Models.userModel>
+
+@{
+    ViewBag.Title = "AcList";
+}
+
+<h2>出品リスト</h2>
+
+@using (Html.BeginForm())
+{
+    <div class="d1" style="float:left;margin-right:10px;">
+        <input type="radio" name="select" value="and" checked="@Session["and"]">AND
+        <input type="radio" name="select" value="or" checked="@Session["or"]">OR
+    </div>
+    <div class="div2" style="float:left;margin-right:10px;margin-right:10px;">
+        <select name="ex">
+            <option value="all" @Session["all"]> 全て </option>
+            <option value="exh" @Session["exh"]> 出品 </option>
+            <option value="bid" @Session["bid"]> 検索 </option>
+        </select>
+    </div>
+
+    <div class="div3" style="float:left;margin-right:10px;">
+        <select name="sort">
+            <option value="time" @Session["time"]> 入札締切日時 </option>
+            <option value="day" @Session["day"]> 出品登録日 </option>
+            <option value="tit" @Session["tit"]> タイトル </option>
+        </select>
+        <select name="acde">
+            <option value="asc" @Session["asc"]> 昇順 </option>
+            <option value="des" @Session["des"]> 降順 </option>
+        </select>
+    </div>
+
+    <div class="div4" style="margin-right:10px;">
+        <input type="checkbox" name="riyu" value="" checked="" style="margin-right:5px;">入札終了
+    </div>
+    <p>
+        <div class="form" style="position:relative;">
+            <select name="example1">
+                <option value="id" @Session["selid"]> ID </option>
+                <option value="title" @Session["selna"]> タイトル </option>
+                <option value="detail" @Session["selem"]> 詳細 </option>
+            </select>
+            <input type="text" name="serch1" id="serch1" required value="@Session["serch1"]" placeholder="serch">
+            <input type="submit" value="検索" name="serch" class="btn btn-default" /> @ViewBag.error
+        </div>
+
+        @*更新*@
+        <div class="translate" style="float:right">
+            <button type="button"><img src="~/image/translate.png" alt="translate" width="20" height="22" onclick="location.href = 'http://localhost:49405/Home/AcList'" /></button>
+        </div>
+
+        <div id="div1" style="visibility:hidden;">
+            <select name="example2">
+                <option value="id" @Session["selid2"]> ID </option>
+                <option value="title" @Session["selna2"]> タイトル </option>
+                <option value="detail" @Session["selem2"]> 詳細 </option>
+            </select>
+            <input type="text" name="serch2" id="serch2" value="@Session["serch2"]" placeholder="serch">
+        </div>
+    </p>
+}
+<p>
+    <div class="d3" style="margin-right:5px;float:left">
+        <input type="button" value="+" id="pull" onclick="Click1(); Pmc();" class="btn btn-default " />
+        <script>
+            function Click1() {
+                if (document.all.div1.style.visibility == "hidden") {
+
+                    document.all.div1.style.visibility = "visible"
+                } else {
+                    document.all.div1.style.visibility = "hidden"
+                }
+            }
+            function Pmc() {
+                if (document.getElementById('pull').value == "+") {
+                    document.getElementById('pull').value = "-"
+                } else {
+                    document.getElementById('pull').value = "+"
+                }
+            }
+        </script>
+    </div>
+</p>
+
+<br>
+<br>
+@foreach (var item in Model)
+{
+    <figure class="list">
+        <img src="data:image/jpg;base64,@item.image" alt="image" style="max-width:100%;height:370px;" />
+        <figcaption>
+            <h2>
+                @Html.DisplayNameFor(model => model.title):
+                @Html.DisplayFor(modelItem => item.title)
+            </h2>
+            <h5>
+                @Html.DisplayNameFor(model => model.detail):
+                @Html.DisplayFor(modelItem => item.detail)
+            </h5>
+            <h5>
+                @Html.DisplayNameFor(model => model.money):
+                @Html.DisplayFor(modelItem => item.money)
+            </h5>
+            <h5>
+                @Html.DisplayNameFor(model => model.price):
+                @Html.DisplayFor(modelItem => item.price)
+            </h5>
+            <h4>
+                <p id="RealtimeClock"></p>
+                <script>
+                    function set2fig(num) {
+                        var ret;
+                        if (num < 10) { ret = "0" + num; }
+                        else { ret = num; }
+                        return ret;
+                    }
+                    function showClock() {
+                        var nowTime = new Date();
+                        var nowYear = set2fig(nowTime.getFullYear());
+                        var nowMonth = set2fig(nowTime.getMonth() + 1);
+                        var nowDate = set2fig(nowTime.getDate());
+                        var nowHour = set2fig(nowTime.getHours());
+                        var nowMin = set2fig(nowTime.getMinutes());
+                        var nowSec = set2fig(nowTime.getSeconds());
+                        var msg = "TIME : " + nowYear + "/" + nowMonth + "/" + nowDate + " " + nowHour + ":" + nowMin + ":" + nowSec + "";
+                        document.getElementById("RealtimeClock").innerHTML = msg;
+                    }
+                    setInterval('showClock()', 1000);
+                </script>
+            </h4>
+            <h4>
+                @Html.DisplayNameFor(model => model.lasttime):
+                @Html.DisplayFor(modelItem => item.lasttime)
+            </h4>
+            <h5>
+                @Html.DisplayNameFor(model => model.id):
+                @Html.DisplayFor(modelItem => item.id)
+            </h5>
+            <h6>
+                @Html.ActionLink("Edit", "AcEdit", new { id = item.id, title = item.title, detail = item.detail, money = item.money, price = item.price, time = item.time, lasttime = item.lasttime }) |
+                @Html.ActionLink("Details", "AcDetails", new { id = item.id, title = item.title, detail = item.detail, money = item.money, price = item.price, time = item.time, lasttime = item.lasttime }) |
+                @Html.ActionLink("Delete", "AcDelete", new { id = item.id, title = item.title, detail = item.detail, money = item.money, price = item.price, time = item.time, lasttime = item.lasttime })
+            </h6>
+
+        </figcaption><a href="#"></a>
+    </figure>
+    <style>
+        .list {
+            font-family: 'Raleway', sans-serif;
+            position: relative;
+            display: inline-block;
+            overflow: hidden;
+            margin: 8px 8px;
+            min-width: 200px;
+            max-width: 315px;
+            width: 100%;
+            color: #ffffff;
+            font-size: 16px;
+            text-align: left;
+        }
+
+            .list * {
+                -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+                -webkit-transition: all 0.25s ease;
+                transition: all 0.25s ease;
+            }
+
+            .list:before {
+                position: absolute;
+                top: 10px;
+                bottom: 10px;
+                left: 10px;
+                right: 10px;
+                top: 100%;
+                content: '';
+                background-color: rgba(51, 51, 51, 0.9);
+                -webkit-transition: all 0.25s ease;
+                transition: all 0.25s ease;
+                -webkit-transition-delay: 0.25s;
+                transition-delay: 0.25s;
+            }
+
+            .list img {
+                position: center;
+                vertical-align: top;
+                max-width: 100%;
+                max-height: 150%;
+                backface-visibility: hidden;
+            }
+
+            .list figcaption {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 1;
+                align-items: center;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .list h2,
+            .list h4,
+            .list h5,
+            .list h6 {
+                margin: 0;
+                opacity: 0;
+                letter-spacing: 1px;
+            }
+
+            .list h2 {
+                -webkit-transform: translateY(-100%);
+                transform: translateY(-100%);
+                text-transform: uppercase;
+                font-weight: 400;
+                -webkit-transition-delay: 0.05s;
+                transition-delay: 0.05s;
+                margin-bottom: 5px;
+            }
+
+            .list h4 {
+                -webkit-transform: translateY(-100%);
+                transform: translateY(-100%);
+                text-transform: uppercase;
+                font-weight: 400;
+                -webkit-transition-delay: 0.05s;
+                transition-delay: 0.05s;
+                margin-bottom: 5px;
+            }
+
+            .list h5 {
+                -webkit-transform: translateY(-100%);
+                transform: translateY(-100%);
+                text-transform: uppercase;
+                font-weight: 400;
+                -webkit-transition-delay: 0.05s;
+                transition-delay: 0.05s;
+                margin-bottom: 5px;
+            }
+
+            .list h6 {
+                -webkit-transform: translateY(-100%);
+                transform: translateY(-100%);
+                text-transform: uppercase;
+                font-weight: 400;
+                -webkit-transition-delay: 0.05s;
+                transition-delay: 0.05s;
+            }
+
+            .list a {
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 1;
+            }
+
+            .list:hover:before,
+            .list.hover:before {
+                top: 10px;
+                -webkit-transition-delay: 0s;
+                transition-delay: 0s;
+            }
+
+            .list:hover h2,
+            .list.hover h2,
+            .list:hover h4,
+            .list.hover h4,
+            .list:hover h5,
+            .list.hover h5,
+            .list:hover h6,
+            .list.hover h6 {
+                -webkit-transform: translateY(0);
+                transform: translateY(0);
+                opacity: 1;
+                text-align: center;
+            }
+
+            .list:hover h2,
+            .list.hover h2 {
+                -webkit-transition-delay: 0.3s;
+                transition-delay: 0.3s;
+                text-align: center;
+            }
+
+            .list:hover h4,
+            .list.hover h4 {
+                -webkit-transition-delay: 0.3s;
+                transition-delay: 0.3s;
+                text-align: center;
+            }
+
+            .list:hover h5,
+            .list.hover h5 {
+                -webkit-transition-delay: 0.2s;
+                transition-delay: 0.2s;
+                text-align: center;
+            }
+
+            .list:hover h6,
+            .list.hover h6 {
+                -webkit-transition-delay: 0.2s;
+                transition-delay: 0.2s;
+            }
+        /* Demo purposes only */
+        body {
+            /*background-color: #212121;*/
+            background-color: #ffffff;
+        }
+    </style>
+}
+
+
+

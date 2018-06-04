@@ -1,0 +1,52 @@
+﻿@model IEnumerable<hpl.Models.userModel>
+
+@{
+    ViewBag.Title = "AcuserList";
+}
+
+<h2>ユーザーリスト</h2>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.id)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.password)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.mail)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.remark)
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.id)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.password)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.mail)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.remark)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "AcuserEdit", new { id = item.id, name = item.name, password = item.password, mail = item.mail, remark = item.remark }) |
+            @Html.ActionLink("Delete", "AcuserDelete", new { id = item.id, name = item.name, password = item.password, mail = item.mail, remark = item.remark })
+        </td>
+    </tr>
+}
+
+</table>
