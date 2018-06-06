@@ -7,10 +7,10 @@
 <h2>Acbid</h2>
 
 
-@using (Html.BeginForm())
+@using (Html.BeginForm("Acbid", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
         <h4>userModel</h4>
         <hr />
@@ -20,55 +20,80 @@
         <div class="form-group">
             @Html.LabelFor(model => model.id, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.id, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.id, "", new { @class = "text-danger" })
+                ：@ViewBag.id
             </div>
         </div>
 
         <div class="form-group">
             @Html.LabelFor(model => model.title, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.title, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.title, "", new { @class = "text-danger" })
+                ：@ViewBag.titl
             </div>
         </div>
 
         <div class="form-group">
             @Html.LabelFor(model => model.money, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.money, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.money, "", new { @class = "text-danger" })
+                ：@ViewBag.money  <img src="~/aicon/next.jpg" width="38" height="30" style="margin-left:50px"><input type="text" name="bidprice" id="bidprice" style="margin-left:50px" placeholder="入札希望額">
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.price, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.lastprice, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.price, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.price, "", new { @class = "text-danger" })
+                ：@ViewBag.lastprice
             </div>
         </div>
 
         <div class="form-group">
             @Html.LabelFor(model => model.time, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.time, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.time, "", new { @class = "text-danger" })
+                <p id="RealtimeClock" style="margin-top:5px;"></p>
+                <script>
+                    function set2fig(num) {
+                        var ret;
+                        if (num < 10) { ret = "0" + num; }
+                        else { ret = num; }
+                        return ret;
+                    }
+                    function showClock() {
+                        var nowTime = new Date();
+                        var nowYear = set2fig(nowTime.getFullYear());
+                        var nowMonth = set2fig(nowTime.getMonth() + 1);
+                        var nowDate = set2fig(nowTime.getDate());
+                        var nowHour = set2fig(nowTime.getHours());
+                        var nowMin = set2fig(nowTime.getMinutes());
+                        var nowSec = set2fig(nowTime.getSeconds());
+                        var msg = "：" + nowYear + "/" + nowMonth + "/" + nowDate + " " + nowHour + ":" + nowMin + ":" + nowSec;
+                        document.getElementById("RealtimeClock").innerHTML = msg;
+                    }
+                    setInterval('showClock()', 1000);
+                </script>
             </div>
         </div>
 
         <div class="form-group">
+            @Html.LabelFor(model => model.lasttime, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                ：@ViewBag.lasttime
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="control-label col-md-2"><b>image</b></div>
+            <div class="col-md-10">
+
+                <img src="data:image/jpg;base64,@Model.image" alt="image" style="max-width:100%;height:370px;" />
+            </div>
+        </div>
+        <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="入札" class="btn btn-default" />
-                <input type="button" value="キャンセル" class="btn btn-default" style="margin-top:15px" onclick="location.href = 'http://localhost:49405/'" />
+                <input type="button" value="キャンセル" class="btn btn-default" onclick="location.href = 'http://localhost:49405/Home/AcList'" />
             </div>
         </div>
     </div>
 }
-
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")

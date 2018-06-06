@@ -33,7 +33,7 @@ namespace hpl.Models
         public string money { get; set; }
 
         [RegularExpression(@"[0-9]+", ErrorMessage = "半角数字のみ入力できます。")]
-        public string price { get; set; }
+        public string lastprice { get; set; }
 
         public DateTime time { get; set; }
 

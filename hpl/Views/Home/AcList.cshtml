@@ -46,11 +46,6 @@
             <input type="submit" value="検索" name="serch" class="btn btn-default" /> @ViewBag.error
         </div>
 
-        @*更新*@
-        <div class="translate" style="float:right">
-            <button type="button"><img src="~/image/translate.png" alt="translate" width="20" height="22" onclick="location.href = 'http://localhost:49405/Home/AcList'" /></button>
-        </div>
-
         <div id="div1" style="visibility:hidden;">
             <select name="example2">
                 <option value="id" @Session["selid2"]> ID </option>
@@ -62,8 +57,8 @@
     </p>
 }
 <p>
-    <div class="d3" style="margin-right:5px;float:left">
-        <input type="button" value="+" id="pull" onclick="Click1(); Pmc();" class="btn btn-default " />
+    <div class="d3" style="margin-right:10px;float:left">
+        <input type="button" value="＋" id="pull" onclick="Click1(); Pmc();" class="btn btn-default " />
         <script>
             function Click1() {
                 if (document.all.div1.style.visibility == "hidden") {
@@ -74,246 +69,356 @@
                 }
             }
             function Pmc() {
-                if (document.getElementById('pull').value == "+") {
-                    document.getElementById('pull').value = "-"
+                if (document.getElementById('pull').value == "＋") {
+                    document.getElementById('pull').value = "－"
                 } else {
-                    document.getElementById('pull').value = "+"
+                    document.getElementById('pull').value = "＋"
                 }
             }
         </script>
     </div>
 </p>
+@*更新*@
+<div class="translate" style="float:left;margin-right:10px">
+    <button type="button"><img src="~/image/translate.png" alt="translate" width="20" height="22" onclick="location.href = 'http://localhost:49405/Home/AcList'" /></button>
+</div>
+<button class="btn btn-primary" data-toggle="modal" data-target="#modal-sample">
+    モーダルを表示
+</button>
+
+<!-- 2.モーダルの配置 -->
+<div class="modal" id="modal-sample" tabindex="-5">
+    <div class="modal-dialog">
+
+        <!-- 3.モーダルのコンテンツ -->
+        <div class="modal-content">
+            <!-- 4.モーダルのヘッダ -->
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="modal-label">モーダルのタイトルを表示する</h4>
+            </div>
+            <!-- 5.モーダルのボディ -->
+            <div class="modal-body">
+                コンテンツの本文
+            </div>
+            <!-- 6.モーダルのフッタ -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+                <button type="button" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <br>
 <br>
-@foreach (var item in Model)
-{
-    <figure class="list">
-        <img src="data:image/jpg;base64,@item.image" alt="image" style="max-width:100%;height:370px;" />
-        <figcaption>
-            <h2>
-                @Html.DisplayNameFor(model => model.title):
-                @Html.DisplayFor(modelItem => item.title)
-            </h2>
-            <h5>
-                @Html.DisplayNameFor(model => model.detail):
-                @Html.DisplayFor(modelItem => item.detail)
-            </h5>
-            <h5>
-                @Html.DisplayNameFor(model => model.money):
-                @Html.DisplayFor(modelItem => item.money)
-            </h5>
-            <h5>
-                @Html.DisplayNameFor(model => model.price):
-                @Html.DisplayFor(modelItem => item.price)
-            </h5>
-            <h4>
-                <p id="RealtimeClock"></p>
-                <script>
-                    function set2fig(num) {
-                        var ret;
-                        if (num < 10) { ret = "0" + num; }
-                        else { ret = num; }
-                        return ret;
-                    }
-                    function showClock() {
-                        var nowTime = new Date();
-                        var nowYear = set2fig(nowTime.getFullYear());
-                        var nowMonth = set2fig(nowTime.getMonth() + 1);
-                        var nowDate = set2fig(nowTime.getDate());
-                        var nowHour = set2fig(nowTime.getHours());
-                        var nowMin = set2fig(nowTime.getMinutes());
-                        var nowSec = set2fig(nowTime.getSeconds());
-                        var msg = "TIME : " + nowYear + "/" + nowMonth + "/" + nowDate + " " + nowHour + ":" + nowMin + ":" + nowSec + "";
-                        document.getElementById("RealtimeClock").innerHTML = msg;
-                    }
-                    setInterval('showClock()', 1000);
-                </script>
-            </h4>
-            <h4>
-                @Html.DisplayNameFor(model => model.lasttime):
-                @Html.DisplayFor(modelItem => item.lasttime)
-            </h4>
-            <h5>
-                @Html.DisplayNameFor(model => model.id):
-                @Html.DisplayFor(modelItem => item.id)
-            </h5>
-            <h6>
-                @Html.ActionLink("Edit", "AcEdit", new { id = item.id, title = item.title, detail = item.detail, money = item.money, price = item.price, time = item.time, lasttime = item.lasttime }) |
-                @Html.ActionLink("Details", "AcDetails", new { id = item.id, title = item.title, detail = item.detail, money = item.money, price = item.price, time = item.time, lasttime = item.lasttime }) |
-                @Html.ActionLink("Delete", "AcDelete", new { id = item.id, title = item.title, detail = item.detail, money = item.money, price = item.price, time = item.time, lasttime = item.lasttime })
-            </h6>
 
-        </figcaption><a href="#"></a>
-    </figure>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
+    <script>
+        $(function () {
+            var page = 0;
+            function draw() {
+                $('#page').html(page + 1);
+                $('tr').hide();
+                $('tr:first,tr:gt(' + page * 10 + '):lt(10)').show();
+            }
+            $('#first').click(function () {
+                page = 0;;
+                draw();
+            });
+            $('#last').click(function () {
+                page = Math.ceil($("#table tr").size() / 10) - 1;
+                draw();
+            });
+            $('#prev').click(function () {
+                if (page > 0) {
+                    page--;
+                    draw();
+                }
+            });
+            $('#next').click(function () {
+                if (page < ($('tr').size() - 1) / 10 - 1) {
+                    page++;
+                    draw();
+                }
+            });
+            draw();
+        });
+    </script>
     <style>
-        .list {
-            font-family: 'Raleway', sans-serif;
-            position: relative;
-            display: inline-block;
-            overflow: hidden;
-            margin: 8px 8px;
-            min-width: 200px;
-            max-width: 315px;
-            width: 100%;
-            color: #ffffff;
-            font-size: 16px;
-            text-align: left;
-        }
-
-            .list * {
-                -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-                -webkit-transition: all 0.25s ease;
-                transition: all 0.25s ease;
-            }
-
-            .list:before {
-                position: absolute;
-                top: 10px;
-                bottom: 10px;
-                left: 10px;
-                right: 10px;
-                top: 100%;
-                content: '';
-                background-color: rgba(51, 51, 51, 0.9);
-                -webkit-transition: all 0.25s ease;
-                transition: all 0.25s ease;
-                -webkit-transition-delay: 0.25s;
-                transition-delay: 0.25s;
-            }
-
-            .list img {
-                position: center;
-                vertical-align: top;
-                max-width: 100%;
-                max-height: 150%;
-                backface-visibility: hidden;
-            }
-
-            .list figcaption {
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                z-index: 1;
-                align-items: center;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-            }
-
-            .list h2,
-            .list h4,
-            .list h5,
-            .list h6 {
-                margin: 0;
-                opacity: 0;
-                letter-spacing: 1px;
-            }
-
-            .list h2 {
-                -webkit-transform: translateY(-100%);
-                transform: translateY(-100%);
-                text-transform: uppercase;
-                font-weight: 400;
-                -webkit-transition-delay: 0.05s;
-                transition-delay: 0.05s;
-                margin-bottom: 5px;
-            }
-
-            .list h4 {
-                -webkit-transform: translateY(-100%);
-                transform: translateY(-100%);
-                text-transform: uppercase;
-                font-weight: 400;
-                -webkit-transition-delay: 0.05s;
-                transition-delay: 0.05s;
-                margin-bottom: 5px;
-            }
-
-            .list h5 {
-                -webkit-transform: translateY(-100%);
-                transform: translateY(-100%);
-                text-transform: uppercase;
-                font-weight: 400;
-                -webkit-transition-delay: 0.05s;
-                transition-delay: 0.05s;
-                margin-bottom: 5px;
-            }
-
-            .list h6 {
-                -webkit-transform: translateY(-100%);
-                transform: translateY(-100%);
-                text-transform: uppercase;
-                font-weight: 400;
-                -webkit-transition-delay: 0.05s;
-                transition-delay: 0.05s;
-            }
-
-            .list a {
-                top: 0;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                z-index: 1;
-            }
-
-            .list:hover:before,
-            .list.hover:before {
-                top: 10px;
-                -webkit-transition-delay: 0s;
-                transition-delay: 0s;
-            }
-
-            .list:hover h2,
-            .list.hover h2,
-            .list:hover h4,
-            .list.hover h4,
-            .list:hover h5,
-            .list.hover h5,
-            .list:hover h6,
-            .list.hover h6 {
-                -webkit-transform: translateY(0);
-                transform: translateY(0);
-                opacity: 1;
-                text-align: center;
-            }
-
-            .list:hover h2,
-            .list.hover h2 {
-                -webkit-transition-delay: 0.3s;
-                transition-delay: 0.3s;
-                text-align: center;
-            }
-
-            .list:hover h4,
-            .list.hover h4 {
-                -webkit-transition-delay: 0.3s;
-                transition-delay: 0.3s;
-                text-align: center;
-            }
-
-            .list:hover h5,
-            .list.hover h5 {
-                -webkit-transition-delay: 0.2s;
-                transition-delay: 0.2s;
-                text-align: center;
-            }
-
-            .list:hover h6,
-            .list.hover h6 {
-                -webkit-transition-delay: 0.2s;
-                transition-delay: 0.2s;
-            }
-        /* Demo purposes only */
-        body {
-            /*background-color: #212121;*/
-            background-color: #ffffff;
+        #first, #prev, #next, #last {
+            color: black;
+            cursor: pointer;
         }
     </style>
-}
+</head>
+<body>
+    <span id="first">＜＜</span> <span id="prev">＜前</span> <span id="page"></span> <span id="next">次＞</span> <span id="last">＞＞</span>
+    <table class="table" id="table">
 
+        <div id="pmain">
+            @foreach (var item in Model)
+            {
+                <figure class="list">
+                    <img src="data:image/jpg;base64,@item.image" alt="image" style="max-width:100%;height:370px;" />
+                    <figcaption>
+                        <h3>
+                            @Html.DisplayNameFor(model => model.title):
+                            @Html.DisplayFor(modelItem => item.title)
+                        </h3>
+                        <h5>
+                            @Html.DisplayNameFor(model => model.money):
+                            @Html.DisplayFor(modelItem => item.money)
+                        </h5>
+                        <h5>
+                            @Html.DisplayNameFor(model => model.lastprice):
+                            @Html.DisplayFor(modelItem => item.lastprice)
+                        </h5>
+                        <h4>
+                            <p></p>
+                        </h4>
+                        <script>
+                            function set2fig(num) {
+                                var ret;
+                                if (num < 10) { ret = "0" + num; }
+                                else { ret = num; }
+                                return ret;
+                            }
+
+                            function showClock() {
+                                var nowTime = new Date();
+                                var nowYear = set2fig(nowTime.getFullYear());
+                                var nowMonth = set2fig(nowTime.getMonth() + 1);
+                                var nowDate = set2fig(nowTime.getDate());
+                                var nowHour = set2fig(nowTime.getHours());
+                                var nowMin = set2fig(nowTime.getMinutes());
+                                var nowSec = set2fig(nowTime.getSeconds());
+                                var msg = "REALTIME : " + nowYear + "/" + nowMonth + "/" + nowDate + " " + nowHour + ":" + nowMin + ":" + nowSec + "";
+                                var time = document.getElementById("pmain").getElementsByTagName("p");
+                                for (var i = 0; i < time.length; i++) {
+                                    time[i].innerHTML = msg;
+                                }
+                            }
+                            setInterval('showClock()', 1000);
+                        </script>
+
+                        <h5>
+                            @Html.DisplayNameFor(model => model.time):
+                            @Html.DisplayFor(modelItem => item.time)
+                        </h5>
+                        <h4>
+                            @Html.DisplayNameFor(model => model.lasttime):
+                            @Html.DisplayFor(modelItem => item.lasttime)
+                        </h4>
+                        <h5>
+                            @Html.DisplayNameFor(model => model.id):
+                            @Html.DisplayFor(modelItem => item.id)
+                        </h5>
+                        <h6>
+                            @Html.ActionLink("Edit", "AcEdit", new { id = item.id, title = item.title, detail = item.detail, money = item.money, lastprice = item.lastprice, time = item.time, lasttime = item.lasttime }) |
+                            @Html.ActionLink("Details", "AcDetails", new { id = item.id, title = item.title, detail = item.detail, money = item.money, lastprice = item.lastprice, time = item.time, lasttime = item.lasttime }) |
+                            @Html.ActionLink("Bid", "Acbid", new { id = item.id, title = item.title, detail = item.detail, money = item.money, lastprice = item.lastprice, time = item.time, lasttime = item.lasttime }) |
+                            @Html.ActionLink("Delete", "AcDelete", new { id = item.id, title = item.title, detail = item.detail, money = item.money, lastprice = item.lastprice, time = item.time, lasttime = item.lasttime })
+                        </h6>
+
+                    </figcaption><a href="#"></a>
+                </figure>
+                <style id="fig">
+                    .list {
+                        font-family: 'Raleway', sans-serif;
+                        position: relative;
+                        display: inline-block;
+                        overflow: hidden;
+                        margin: 8px 8px;
+                        min-width: 200px;
+                        max-width: 315px;
+                        width: 100%;
+                        color: #ffffff;
+                        font-size: 16px;
+                        text-align: left;
+                    }
+
+                        .list * {
+                            -webkit-box-sizing: border-box;
+                            box-sizing: border-box;
+                            -webkit-transition: all 0.25s ease;
+                            transition: all 0.25s ease;
+                        }
+
+                        .list:before {
+                            position: absolute;
+                            top: 10px;
+                            bottom: 10px;
+                            left: 10px;
+                            right: 10px;
+                            top: 100%;
+                            content: '';
+                            background-color: rgba(51, 51, 51, 0.9);
+                            -webkit-transition: all 0.25s ease;
+                            transition: all 0.25s ease;
+                            -webkit-transition-delay: 0.25s;
+                            transition-delay: 0.25s;
+                        }
+
+                        .list img {
+                            position: center;
+                            vertical-align: top;
+                            max-width: 100%;
+                            max-height: 150%;
+                            backface-visibility: hidden;
+                        }
+
+                        .list figcaption {
+                            position: absolute;
+                            top: 0;
+                            bottom: 0;
+                            left: 0;
+                            right: 0;
+                            z-index: 1;
+                            align-items: center;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                        }
+
+                        .list h2,
+                        .list h3,
+                        .list h4,
+                        .list h5,
+                        .list h6 {
+                            margin: 0;
+                            opacity: 0;
+                            letter-spacing: 1px;
+                        }
+
+                        .list h2 {
+                            -webkit-transform: translateY(-100%);
+                            transform: translateY(-100%);
+                            text-transform: uppercase;
+                            font-weight: 400;
+                            -webkit-transition-delay: 0.05s;
+                            transition-delay: 0.05s;
+                            margin-bottom: 5px;
+                        }
+
+                        .list h3 {
+                            -webkit-transform: translateY(-100%);
+                            transform: translateY(-100%);
+                            text-transform: uppercase;
+                            font-weight: 400;
+                            -webkit-transition-delay: 0.05s;
+                            transition-delay: 0.05s;
+                            margin-bottom: 5px;
+                        }
+
+                        .list h4 {
+                            -webkit-transform: translateY(-100%);
+                            transform: translateY(-100%);
+                            text-transform: uppercase;
+                            font-weight: 400;
+                            -webkit-transition-delay: 0.05s;
+                            transition-delay: 0.05s;
+                            margin-bottom: 5px;
+                        }
+
+                        .list h5 {
+                            -webkit-transform: translateY(-100%);
+                            transform: translateY(-100%);
+                            text-transform: uppercase;
+                            font-weight: 400;
+                            -webkit-transition-delay: 0.05s;
+                            transition-delay: 0.05s;
+                            margin-bottom: 5px;
+                        }
+
+                        .list h6 {
+                            -webkit-transform: translateY(-100%);
+                            transform: translateY(-100%);
+                            text-transform: uppercase;
+                            font-weight: 400;
+                            -webkit-transition-delay: 0.05s;
+                            transition-delay: 0.05s;
+                        }
+
+                        .list a {
+                            top: 0;
+                            bottom: 0;
+                            left: 0;
+                            right: 0;
+                            z-index: 1;
+                        }
+
+                        .list:hover:before,
+                        .list.hover:before {
+                            top: 10px;
+                            -webkit-transition-delay: 0s;
+                            transition-delay: 0s;
+                        }
+
+                        .list:hover h2,
+                        .list.hover h2,
+                        .list:hover h3,
+                        .list.hover h3,
+                        .list:hover h4,
+                        .list.hover h4,
+                        .list:hover h5,
+                        .list.hover h5,
+                        .list:hover h6,
+                        .list.hover h6 {
+                            -webkit-transform: translateY(0);
+                            transform: translateY(0);
+                            opacity: 1;
+                            text-align: center;
+                        }
+
+                        .list:hover h2,
+                        .list.hover h2 {
+                            -webkit-transition-delay: 0.3s;
+                            transition-delay: 0.3s;
+                            text-align: center;
+                        }
+
+                        .list:hover h3,
+                        .list.hover h3 {
+                            -webkit-transition-delay: 0.3s;
+                            transition-delay: 0.3s;
+                            text-align: center;
+                        }
+
+                        .list:hover h4,
+                        .list.hover h4 {
+                            -webkit-transition-delay: 0.3s;
+                            transition-delay: 0.3s;
+                            text-align: center;
+                        }
+
+                        .list:hover h5,
+                        .list.hover h5 {
+                            -webkit-transition-delay: 0.2s;
+                            transition-delay: 0.2s;
+                            text-align: center;
+                        }
+
+                        .list:hover h6,
+                        .list.hover h6 {
+                            -webkit-transition-delay: 0.2s;
+                            transition-delay: 0.2s;
+                        }
+
+                    body {
+                        background-color: #ffffff;
+                    }
+                </style>
+            }
+        </div>
+    </table>
+</body>
+</html>
 
 

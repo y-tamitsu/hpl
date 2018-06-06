@@ -236,6 +236,7 @@
     <Content Include="Views\Home\AcDetails.cshtml" />
     <Content Include="Views\Home\AcuserDelete.cshtml" />
     <Content Include="Views\Home\Acbid.cshtml" />
+    <Content Include="Views\Home\AcLogin.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

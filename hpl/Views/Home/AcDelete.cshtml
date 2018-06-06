@@ -15,45 +15,71 @@
     <dd>
         ：@ViewBag.id
     </dd>
+
     <dt>
         @Html.DisplayNameFor(model => model.title)
     </dt>
     <dd>
         @Html.DisplayFor(model => model.title)：@ViewBag.titl
     </dd>
+
     <dt>
         @Html.DisplayNameFor(model => model.detail)
     </dt>
     <dd>
         @Html.DisplayFor(model => model.detail)：@ViewBag.detail
     </dd>
+
     <dt>
         @Html.DisplayNameFor(model => model.money)
     </dt>
     <dd>
         @Html.DisplayFor(model => model.money)：@ViewBag.money
     </dd>
+
     <dt>
-        @Html.DisplayNameFor(model => model.price)
+        @Html.DisplayNameFor(model => model.lastprice)
     </dt>
     <dd>
-        @Html.DisplayFor(model => model.price)：@ViewBag.price
+        @Html.DisplayFor(model => model.lastprice)：@ViewBag.lastprice
     </dd>
+
     <dt>
         @Html.DisplayNameFor(model => model.time)
     </dt>
     <dd>
-        ：@ViewBag.time
+        <p id="RealtimeClock" style="margin-top:5px;"></p>
+        <script>
+            function set2fig(num) {
+                var ret;
+                if (num < 10) { ret = "0" + num; }
+                else { ret = num; }
+                return ret;
+            }
+            function showClock() {
+                var nowTime = new Date();
+                var nowYear = set2fig(nowTime.getFullYear());
+                var nowMonth = set2fig(nowTime.getMonth() + 1);
+                var nowDate = set2fig(nowTime.getDate());
+                var nowHour = set2fig(nowTime.getHours());
+                var nowMin = set2fig(nowTime.getMinutes());
+                var nowSec = set2fig(nowTime.getSeconds());
+                var msg = "：" + nowYear + "/" + nowMonth + "/" + nowDate + " " + nowHour + ":" + nowMin + ":" + nowSec;
+                document.getElementById("RealtimeClock").innerHTML = msg;
+            }
+            setInterval('showClock()', 1000);
+        </script>
     </dd>
-    <dt>
-        @Html.DisplayNameFor(model => model.image)
-    </dt>
     <dt>
         @Html.DisplayNameFor(model => model.lasttime)
     </dt>
     <dd>
         ：@ViewBag.lasttime
     </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.image)
+    </dt>
     <dd>
         <img src="data:image/jpg;base64,@Model.image" alt="image" style="max-width:100%;height:370px;" />
     </dd>
