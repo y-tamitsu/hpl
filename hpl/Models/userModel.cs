@@ -40,5 +40,7 @@ namespace hpl.Models
         public DateTime lasttime { get; set; }
 
         public string image { get; set; }
+
+        public int disc { get; set; }
     }
 }

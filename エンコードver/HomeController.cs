@@ -180,7 +180,7 @@ namespace hpl.Controllers
                 conn.Open();
                 using (MySqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $"select * from exhibit ORDER BY item_id ASC;";
+                    cmd.CommandText = $"select * from exhibit ORDER BY item_id ASC";
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
@@ -204,10 +204,29 @@ namespace hpl.Controllers
                 conn.Open();
                 using (MySqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $@"select item_id,money,lastprice,time,lasttime from exhibit where ( item_id = " + id + ")";
+                    cmd.CommandText = $"select item_id,money,lastprice,time,lasttime,disc from exhibit where ( item_id = " + id + ")";
                     MySqlDataReader reader = cmd.ExecuteReader();
                     reader.Read();
-                    result = new userModel { id = int.Parse(reader["item_id"].ToString()), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]) };
+                    result = new userModel { id = int.Parse(reader["item_id"].ToString()), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]), disc = int.Parse(reader["disc"].ToString()) };
+                    return result;
+                }
+            }
+        }
+
+        public userModel Getexuserid(int id)
+        {
+            //Where id = idのSelect
+            string hp = ConfigurationManager.ConnectionStrings["Hp"].ConnectionString;
+            var result = new userModel();
+            using (MySqlConnection conn = new MySqlConnection(hp))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = $"select item_id,money,lastprice,time,lasttime,image,disc from exhibit where ( user_id = " + id + ")";
+                    MySqlDataReader reader = cmd.ExecuteReader();
+                    reader.Read();
+                    result = new userModel { id = int.Parse(reader["item_id"].ToString()), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]), image = System.Convert.ToBase64String((byte[])reader["image"]), disc = int.Parse(reader["disc"].ToString()) };
                     return result;
                 }
             }
@@ -224,7 +243,7 @@ namespace hpl.Controllers
                 conn.Open();
                 using (MySqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"select item_id,money,lastprice from exhibit where ( time = '" + time + "')";
+                    cmd.CommandText = $"select item_id,money,lastprice from exhibit where ( time = '" + time + "')";
                     MySqlDataReader reader = cmd.ExecuteReader();
                     reader.Read();
                     result = new userModel { id = int.Parse(reader["item_id"].ToString()), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString() };
@@ -244,7 +263,7 @@ namespace hpl.Controllers
                 conn.Open();
                 using (MySqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $@"select image from exhibit where ( item_id = " + id + ")";
+                    cmd.CommandText = $"select image from exhibit where ( item_id = " + id + ")";
                     MySqlDataReader reader = cmd.ExecuteReader();
                     reader.Read();
                     result = new userModel { image = System.Convert.ToBase64String((byte[])reader["image"]) };
@@ -264,7 +283,7 @@ namespace hpl.Controllers
                 conn.Open();
                 using (MySqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $@"select time,lasttime from exhibit where item_id = " + id;
+                    cmd.CommandText = $"select time,lasttime from exhibit where item_id = " + id;
                     MySqlDataReader reader = cmd.ExecuteReader();
                     reader.Read();
                     result = new userModel { time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]) };
@@ -283,10 +302,32 @@ namespace hpl.Controllers
                 conn.Open();
                 using (MySqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $@"select * from acuser where user_id = " + id;
+                    cmd.CommandText = $"select * from acuser where user_id = " + id;
                     MySqlDataReader reader = cmd.ExecuteReader();
                     reader.Read();
                     result = new userModel { id = int.Parse(reader["user_id"].ToString()), name = reader["name"].ToString(), password = reader["password"].ToString(), mail = reader["email"].ToString(), remark = reader["remark"].ToString() };
+                    return result;
+                }
+            }
+        }
+
+        // user id による biddata
+        public List<userModel> Getuserbid(int id)
+        {
+            string hp = ConfigurationManager.ConnectionStrings["Hp"].ConnectionString;
+            var result = new List<userModel>();
+            using (MySqlConnection conn = new MySqlConnection(hp))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = $"select * from bid where user_id = " + id;
+                    MySqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        result.Add(new userModel { id = int.Parse(reader["item_id"].ToString()), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]) });
+                    }
                     return result;
                 }
             }
@@ -381,12 +422,7 @@ namespace hpl.Controllers
                     {
                         hpin.Open();
 
-                        cmd.CommandText = @"insert ignore into exhibit (title,detail,money,lastprice,time,lasttime,image) values('" + model.title + "','" + model.detail + "','" + model.money + "','" + model.lastprice + "','" + nowtime + "','" + weektime + "',load_file(" + "'C:/UploadedFiles/" + path + "'))";
-                        cmd.ExecuteNonQuery();
-                        int test = Getex_tit(nowtime).id;
-                        cmd.CommandText = $"create table item_{test} (user_id int, money int, lastprice int, time datetime, lasttime datetime)";
-                        cmd.ExecuteNonQuery();
-                        cmd.CommandText = $"insert into item_{test} (user_id,money,lastprice,time,lasttime) values(" + int.Parse(Session["loginid"].ToString()) + ",'" + model.money + "','" + model.lastprice + "','" + nowtime + "','" + weektime + "')";
+                        cmd.CommandText = @"insert ignore into exhibit (user_id,title,detail,money,lastprice,time,lasttime,image) values(" + int.Parse(Session["loginid"].ToString()) + ",'" + model.title + "','" + model.detail + "','" + model.money + "','" + model.lastprice + "','" + nowtime + "','" + weektime + "',load_file(" + "'C:/UploadedFiles/" + path + "'))";
                         cmd.ExecuteNonQuery();
                         return RedirectToAction("AcList");
                     }
@@ -412,6 +448,8 @@ namespace hpl.Controllers
         public ActionResult AcList(userModel model)
         {
             Session["and"] = "checked";
+            Session["bidend"] = "checked";
+            Session["required"] = "required";
             string hp = ConfigurationManager.ConnectionStrings["Hp"].ConnectionString;
             var AcList = new List<userModel>();
             try
@@ -450,7 +488,7 @@ namespace hpl.Controllers
 
         //リスト絞り込み
         [HttpPost]
-        public ActionResult AcList(string select, string ex, string sort, string acde, string example1, string example2, string serch1, string serch2)
+        public ActionResult AcList(string select, string ex, string sort, string acde, string bidend, string example1, string example2, string serch1, string serch2)
         {
             string hp = ConfigurationManager.ConnectionStrings["Hp"].ConnectionString;
             MySqlConnection hpsel = new MySqlConnection(hp);
@@ -463,11 +501,16 @@ namespace hpl.Controllers
             Session["ex"] = ex;
             Session["sort"] = sort;
             Session["acde"] = acde;
+            Session["bidend"] = bidend;
             Session["example1"] = example1;
             Session["example2"] = example2;
             Session["serch1"] = serch1;
             Session["serch2"] = serch2;
 
+            if (serch1 == null)
+            {
+                Session["required"] = "required";
+            }
             if (select == "and")
             {
                 Session["and"] = null;
@@ -480,29 +523,38 @@ namespace hpl.Controllers
                 Session["or"] = null;
                 Session["or"] = "checked";
             }
-
-            if (ex == "all")
+            if (ex == "non")
             {
+                Session["non"] = null;
                 Session["all"] = null;
                 Session["exh"] = null;
                 Session["bid"] = null;
-                Session["all"] = "checked";
+                Session["non"] = "selected";
+            }
+            else if (ex == "all")
+            {
+                Session["non"] = null;
+                Session["all"] = null;
+                Session["exh"] = null;
+                Session["bid"] = null;
+                Session["all"] = "selected";
             }
             else if (ex == "exh")
             {
+                Session["non"] = null;
                 Session["all"] = null;
                 Session["exh"] = null;
                 Session["bid"] = null;
-                Session["exh"] = "checked";
+                Session["exh"] = "selected";
             }
             else if (ex == "bid")
             {
+                Session["non"] = null;
                 Session["all"] = null;
                 Session["exh"] = null;
                 Session["bid"] = null;
-                Session["bid"] = "checked";
+                Session["bid"] = "selected";
             }
-
             if (example1 == "id")
             {
                 Session["selid"] = null;
@@ -524,7 +576,6 @@ namespace hpl.Controllers
                 Session["selem"] = null;
                 Session["selem"] = "selected";
             }
-
             if (example2 == "id")
             {
                 Session["selid2"] = null;
@@ -580,32 +631,112 @@ namespace hpl.Controllers
                 Session["des"] = "selected";
 
             }
+            if (bidend == "bidend")
+            {
+                Session["bidend"] = null;
+                Session["bidend"] = "checked";
+            }
+            else if (bidend == null)
+            {
+                Session["bidend"] = null;
+            }
 
             try
             {
-                string comand = "";
-                if (string.IsNullOrEmpty(serch2))
+                if (ex == "non")
                 {
-                    if ((example1 == "id") || (example1 == "title") || (example1 == "detail"))
+                    string comand = "";
+                    if (string.IsNullOrEmpty(serch2))
                     {
-                        if ((example1 == "id") && r1)
+                        if ((example1 == "id") || (example1 == "title") || (example1 == "detail"))
                         {
-                            comand = "where item_" + Session["example1"] + " like '%" + Session["serch1"] + "%'";
+                            if ((example1 == "id") && r1)
+                            {
+                                comand = "where (item_" + Session["example1"] + " like '%" + Session["serch1"] + "%')";
+                            }
+                            else if ((example1 == "title") || (example1 == "detail"))
+                            {
+                                comand = "where (" + Session["example1"] + " like '%" + Session["serch1"] + "%')";
+                            }
+                            else
+                            {
+                                ViewBag.error = "IDを数値以外で検索することはできません";
+                            }
+                            using (MySqlConnection conn = new MySqlConnection(hp))
+                            {
+                                conn.Open();
+                                using (MySqlCommand cmd = conn.CreateCommand())
+                                {
+                                    if (bidend == null)
+                                    {
+                                        cmd.CommandText = $"select * from exhibit {comand} and (disc = " + 1 + ") ORDER BY item_id ASC";
+                                    }
+                                    else
+                                    {
+                                        cmd.CommandText = $"select * from exhibit {comand} ORDER BY item_id ASC";
+                                    }
+                                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                                    {
+                                        while (reader.Read())
+                                        {
+                                            AcList.Add(new userModel { id = int.Parse(reader["item_id"].ToString()), title = reader["title"].ToString(), detail = reader["detail"].ToString(), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]), image = System.Convert.ToBase64String((byte[])reader["image"]) });
+                                        }
+                                    }
+                                }
+                            }
+                            if (sort == "time")
+                            {
+                                if (acde == "asc") AcList.Sort((a, b) => a.lasttime.CompareTo(b.lasttime));
+                                else AcList.Sort((a, b) => b.lasttime.CompareTo(a.lasttime));
+                                return View(AcList);
+                            }
+                            else if (sort == "day")
+                            {
+                                if (acde == "asc") AcList.Sort((a, b) => a.time.CompareTo(b.time));
+                                else AcList.Sort((a, b) => b.time.CompareTo(a.time));
+                                return View(AcList);
+                            }
+                            else
+                            {
+                                if (acde == "asc") AcList.Sort((a, b) => a.title.CompareTo(b.title));
+                                else AcList.Sort((a, b) => b.title.CompareTo(a.title));
+                                return View(AcList);
+                            }
                         }
-                        else if ((example1 == "title") || (example1 == "detail"))
+                    }
+                    else
+                    {
+                        if ((example1 == "id" && example2 == "title") || (example1 == "id" && example2 == "detail") || (example1 == "title" && example2 == "id") || (example1 == "detail" && example2 == "id"))
                         {
-                            comand = "where " + Session["example1"] + " like '%" + Session["serch1"] + "%'";
+                            if (example1 == "id" && r1)
+                                comand = "where (item_" + Session["example1"] + " like '%" + Session["serch1"] + "%'" + Session["select"] + " " + Session["example2"] + " like '%" + Session["serch2"] + "%')";
+                            else if (example2 == "id" && r2)
+                                comand = "where (" + Session["example1"] + " like '%" + Session["serch1"] + "%'" + Session["select"] + " item_" + Session["example2"] + " like '%" + Session["serch2"] + "%')";
+                            else if (example1 == "title" || example1 == "detail")
+                                comand = "where (" + Session["example1"] + " like '%" + Session["serch1"] + "%'" + Session["select"] + " item_" + Session["example2"] + " like '%" + Session["serch2"] + "%')";
+                            else if (example2 == "title" || example2 == "detail")
+                                comand = "where (item_" + Session["example1"] + " like '%" + Session["serch1"] + "%'" + Session["select"] + " " + Session["example2"] + " like '%" + Session["serch2"] + "%')";
+                            else
+                                ViewBag.error = "IDを数値以外で検索することはできません";
                         }
-                        else
-                        {
-                            ViewBag.error = "IDを数値以外で検索することはできません";
-                        }
+                        if ((example1 == "title" && example2 == "title") || (example1 == "title" && example2 == "detail") || (example1 == "detail" && example2 == "title") || (example1 == "detail" && example2 == "detail"))
+                            comand = "where (" + Session["example1"] + " like '%" + Session["serch1"] + "%'" + Session["select"] + " " + Session["example2"] + " like '%" + Session["serch2"] + "%')";
+                        if (example1 == "id" && example2 == "id")
+                            comand = "where (item_" + Session["example1"] + " like '%" + Session["serch1"] + "%'" + Session["select"] + " item_" + Session["example2"] + " like '%" + Session["serch2"] + "%')";
+
                         using (MySqlConnection conn = new MySqlConnection(hp))
                         {
                             conn.Open();
                             using (MySqlCommand cmd = conn.CreateCommand())
                             {
-                                cmd.CommandText = $"select * from exhibit {comand} ORDER BY item_id ASC;";
+                                if (bidend == null)
+                                {
+                                    cmd.CommandText = $"select * from exhibit {comand} and (disc = " + 1 + ") ORDER BY item_id ASC";
+                                }
+                                else
+                                {
+                                    cmd.CommandText = $"select * from exhibit {comand} ORDER BY item_id ASC";
+                                }
                                 using (MySqlDataReader reader = cmd.ExecuteReader())
                                 {
                                     while (reader.Read())
@@ -615,10 +746,11 @@ namespace hpl.Controllers
                                 }
                             }
                         }
+
                         if (sort == "time")
                         {
-                            if (acde == "asc") AcList.Sort((a, b) => a.lasttime.CompareTo(b.lasttime));
-                            else AcList.Sort((a, b) => b.lasttime.CompareTo(a.lasttime));
+                            if (acde == "asc") AcList.Sort((a, b) => a.time.CompareTo(b.time));
+                            else AcList.Sort((a, b) => b.time.CompareTo(a.time));
                             return View(AcList);
                         }
                         else if (sort == "day")
@@ -635,42 +767,116 @@ namespace hpl.Controllers
                         }
                     }
                 }
-                else
-                {
-                    if ((example1 == "id" && example2 == "title") || (example1 == "id" && example2 == "detail") || (example1 == "title" && example2 == "id") || (example1 == "detail" && example2 == "id"))
-                    {
-                        if (example1 == "id" && r1)
-                            comand = "where item_" + Session["example1"] + " like '%" + Session["serch1"] + "%'" + Session["select"] + " " + Session["example2"] + " like '%" + Session["serch2"] + "%'";
-                        else if (example2 == "id" && r2)
-                            comand = "where " + Session["example1"] + " like '%" + Session["serch1"] + "%'" + Session["select"] + " item_" + Session["example2"] + " like '%" + Session["serch2"] + "%'";
-                        else if (example1 == "title" || example1 == "detail")
-                            comand = "where " + Session["example1"] + " like '%" + Session["serch1"] + "%'" + Session["select"] + " item_" + Session["example2"] + " like '%" + Session["serch2"] + "%'";
-                        else if (example2 == "title" || example2 == "detail")
-                            comand = "where item_" + Session["example1"] + " like '%" + Session["serch1"] + "%'" + Session["select"] + " " + Session["example2"] + " like '%" + Session["serch2"] + "%'";
-                        else
-                            ViewBag.error = "IDを数値以外で検索することはできません";
-                    }
-                    if ((example1 == "title" && example2 == "title") || (example1 == "title" && example2 == "detail") || (example1 == "detail" && example2 == "title") || (example1 == "detail" && example2 == "detail"))
-                        comand = "where " + Session["example1"] + " like '%" + Session["serch1"] + "%'" + Session["select"] + " " + Session["example2"] + " like '%" + Session["serch2"] + "%'";
-                    if (example1 == "id" && example2 == "id")
-                        comand = "where item_" + Session["example1"] + " like '%" + Session["serch1"] + "%'" + Session["select"] + " item_" + Session["example2"] + " like '%" + Session["serch2"] + "%'";
 
+                else if (ex == "exh")
+                {
+                    var result = new List<userModel>();
                     using (MySqlConnection conn = new MySqlConnection(hp))
                     {
                         conn.Open();
                         using (MySqlCommand cmd = conn.CreateCommand())
                         {
-                            cmd.CommandText = $"select * from exhibit {comand} ORDER BY item_id ASC;";
+                            if (bidend == null)
+                            {
+                                cmd.CommandText = $"select * from exhibit where user_id = " + Session["loginid"] + " and (disc = " + 1 + ") ORDER BY item_id ASC";
+                            }
+                            else
+                            {
+                                cmd.CommandText = $"select * from exhibit where user_id = " + Session["loginid"] + " ORDER BY item_id ASC";
+                            }
+                            MySqlDataReader reader = cmd.ExecuteReader();
+
+                            while (reader.Read())
+                            {
+                                result.Add(new userModel { id = int.Parse(reader["item_id"].ToString()), title = reader["title"].ToString(), detail = reader["detail"].ToString(), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]), image = System.Convert.ToBase64String((byte[])reader["image"]) });
+                            }
+                        }
+                    }
+                    if (sort == "time")
+                    {
+                        if (acde == "asc") result.Sort((a, b) => a.time.CompareTo(b.time));
+                        else result.Sort((a, b) => b.time.CompareTo(a.time));
+                        return View(result);
+                    }
+                    else if (sort == "day")
+                    {
+                        if (acde == "asc") result.Sort((a, b) => a.time.CompareTo(b.time));
+                        else result.Sort((a, b) => b.time.CompareTo(a.time));
+                        return View(result);
+                    }
+                    else
+                    {
+                        if (acde == "asc") result.Sort((a, b) => a.title.CompareTo(b.title));
+                        else result.Sort((a, b) => b.title.CompareTo(a.title));
+                        return View(result);
+                    }
+                }
+                else if (ex == "bid")
+                {
+                    var result = new List<userModel>();
+                    using (MySqlConnection conn = new MySqlConnection(hp))
+                    {
+                        conn.Open();
+                        using (MySqlCommand cmd = conn.CreateCommand())
+                        {
+                            if (bidend == null)
+                            {
+                                cmd.CommandText = $"select * from bid where user_id = " + Session["loginid"] + " ORDER BY item_id ASC";
+                            }
+                            else
+                            {
+                                cmd.CommandText = $"select * from bid where user_id = " + Session["loginid"] + " ORDER BY item_id ASC";
+                            }
+                            MySqlDataReader reader = cmd.ExecuteReader();
+                            while (reader.Read())
+                            {
+                                result.Add(new userModel { id = int.Parse(reader["item_id"].ToString()), title = Getexuserid(int.Parse(Session["loginid"].ToString())).title, detail = Getexuserid(int.Parse(Session["loginid"].ToString())).detail, money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]), image = Getexuserid(int.Parse(Session["loginid"].ToString())).image });
+                            }
+                        }
+                    }
+                    if (sort == "time")
+                    {
+                        if (acde == "asc") result.Sort((a, b) => a.time.CompareTo(b.time));
+                        else result.Sort((a, b) => b.time.CompareTo(a.time));
+                        return View(result);
+                    }
+                    else if (sort == "day")
+                    {
+                        if (acde == "asc") result.Sort((a, b) => a.time.CompareTo(b.time));
+                        else result.Sort((a, b) => b.time.CompareTo(a.time));
+                        return View(result);
+                    }
+                    else
+                    {
+                        if (acde == "asc") result.Sort((a, b) => a.title.CompareTo(b.title));
+                        else result.Sort((a, b) => b.title.CompareTo(a.title));
+                        return View(result);
+                    }
+                }
+                else //ex == all
+                {
+                    using (MySqlConnection conn = new MySqlConnection(hp))
+                    {
+                        conn.Open();
+                        using (MySqlCommand cmd = conn.CreateCommand())
+                        {
+                            if (bidend == null)
+                            {
+                                cmd.CommandText = $"select * from exhibit where disc = " + 1 + " ORDER BY item_id ASC";
+                            }
+                            else
+                            {
+                                cmd.CommandText = $"select * from exhibit ORDER BY item_id ASC";
+                            }
                             using (MySqlDataReader reader = cmd.ExecuteReader())
                             {
                                 while (reader.Read())
                                 {
-                                    AcList.Add(new userModel { id = int.Parse(reader["item_id"].ToString()), title = reader["title"].ToString(), detail = reader["detail"].ToString(), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]), image = System.Convert.ToBase64String((byte[])reader["image"]) });
+                                    AcList.Add(new userModel { id = int.Parse(reader["item_id"].ToString()), title = reader["title"].ToString(), detail = reader["detail"].ToString(), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]), image = Getexuserid(int.Parse(Session["loginid"].ToString())).image });
                                 }
                             }
                         }
                     }
-
                     if (sort == "time")
                     {
                         if (acde == "asc") AcList.Sort((a, b) => a.time.CompareTo(b.time));
@@ -690,40 +896,7 @@ namespace hpl.Controllers
                         return View(AcList);
                     }
                 }
-
-                using (MySqlConnection conn = new MySqlConnection(hp))
-                {
-                    conn.Open();
-                    using (MySqlCommand cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = $"select * from exhibit ORDER BY item_id ASC;";
-                        using (MySqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                AcList.Add(new userModel { id = int.Parse(reader["item_id"].ToString()), title = reader["title"].ToString(), detail = reader["detail"].ToString(), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]), image = System.Convert.ToBase64String((byte[])reader["image"]) });
-                            }
-                        }
-                    }
-                }
-                if (sort == "time")
-                {
-                    if (acde == "asc") AcList.Sort((a, b) => a.time.CompareTo(b.time));
-                    else AcList.Sort((a, b) => b.time.CompareTo(a.time));
-                    return View(AcList);
-                }
-                else if (sort == "day")
-                {
-                    if (acde == "asc") AcList.Sort((a, b) => a.time.CompareTo(b.time));
-                    else AcList.Sort((a, b) => b.time.CompareTo(a.time));
-                    return View(AcList);
-                }
-                else
-                {
-                    if (acde == "asc") AcList.Sort((a, b) => a.title.CompareTo(b.title));
-                    else AcList.Sort((a, b) => b.title.CompareTo(a.title));
-                    return View(AcList);
-                }
+                return View();
             }
             catch (System.Exception er)
             {
@@ -780,7 +953,7 @@ namespace hpl.Controllers
 
                 if (file == null)
                 {
-                    string fnst = @"update ignore exhibit set item_id = " + model.id + ", title = '" + model.title + "', detail = '" + model.detail + "', money = '" + model.money + "', lastprice = '" + model.lastprice + "', time ='" + Convert.ToDateTime(time) + "', lasttime ='" + Convert.ToDateTime(lasttime) + "' where item_id = " + id;
+                    string fnst = @"update ignore exhibit set title = '" + model.title + "', detail = '" + model.detail + "', money = '" + model.money + "', lastprice = '" + model.lastprice + "' where item_id = " + id;
                     MySqlCommand fnup = new MySqlCommand(fnst, hped);
                     fnup.ExecuteScalar();
                 }
@@ -788,11 +961,11 @@ namespace hpl.Controllers
                 {
                     string path = System.IO.Path.GetFileName(file.FileName);
                     file.SaveAs("C:\\UploadedFiles\\" + path);
-                    string edstr = @"update ignore exhibit set item_id = " + model.id + ", title = '" + model.title + "', detail = '" + model.detail + "', money = '" + model.money + "', lastprice = '" + model.lastprice + "', time ='" + Convert.ToDateTime(time) + "', lasttime ='" + Convert.ToDateTime(lasttime) + "', image = load_file(" + "'C:/UploadedFiles/" + path + "')" + " where item_id = " + id;
+                    string edstr = @"update ignore exhibit set title = '" + model.title + "', detail = '" + model.detail + "', money = '" + model.money + "', lastprice = '" + model.lastprice + "', image = load_file(" + "'C:/UploadedFiles/" + path + "')" + " where item_id = " + id;
                     MySqlCommand edst = new MySqlCommand(edstr, hped);
                     edst.ExecuteScalar();
                 }
-                string edite = $"update item_{id} set money = '" + model.money + "', lastprice = '" + model.lastprice + "', time = '" + Convert.ToDateTime(time) + "', lasttime = '" + Convert.ToDateTime(lasttime) + "'";
+                string edite = $"update bid set money = '" + model.money + "', lastprice = '" + model.lastprice + "'";
                 MySqlCommand edit = new MySqlCommand(edite, hped);
                 edit.ExecuteScalar();
                 hped.Close();
@@ -861,20 +1034,12 @@ namespace hpl.Controllers
             hpdel.Open();
             try
             {
-                string delite = $"drop table item_{id}";
-                MySqlCommand delit = new MySqlCommand(delite, hpdel);
-                MySqlParameter dii = new MySqlParameter("@id", MySqlDbType.Int16, 5);
-                dii.Direction = ParameterDirection.Input;
-                dii.Value = id;
-                delit.Parameters.Add(dii);
-                delit.ExecuteNonQuery();
+                string delbid = @"delete from bid where item_id = " + id;
+                MySqlCommand debid = new MySqlCommand(delbid, hpdel);
+                debid.ExecuteNonQuery();
 
-                string delstr = @"delete from exhibit where item_id = @id";
+                string delstr = @"delete from exhibit where item_id = " + id;
                 MySqlCommand delid = new MySqlCommand(delstr, hpdel);
-                MySqlParameter did = new MySqlParameter("@id", MySqlDbType.Int16, 5);
-                did.Direction = ParameterDirection.Input;
-                did.Value = id;
-                delid.Parameters.Add(did);
                 delid.ExecuteNonQuery();
                 return RedirectToAction("AcList");
             }
@@ -1169,7 +1334,7 @@ namespace hpl.Controllers
         }
 
         [HttpPost]
-        public ActionResult Acbid(int bidprice, int id, string money, string lastprice)
+        public ActionResult Acbid(int bidprice, int id, string money, string lastprice, string time, string lasttime)
         {
             try
             {
@@ -1177,9 +1342,23 @@ namespace hpl.Controllers
                 int price = 0;
                 money = Getexhibit(id).money;
                 lastprice = Getexhibit(id).lastprice;
+                time = Gettime(id).time.ToString();
+                lasttime = Gettime(id).lasttime.ToString();
                 if (bidprice >= int.Parse(lastprice))
                 {
                     //入札終了
+                    price = int.Parse(lastprice);
+                    using (MySqlConnection hpup = new MySqlConnection(hp))
+                    {
+                        using (MySqlCommand cmd = hpup.CreateCommand())
+                        {
+                            hpup.Open();
+
+                            string dis = $"update exhibit set disc = " + 0 + " where item_id = " + id;
+                            MySqlCommand disc = new MySqlCommand(dis, hpup);
+                            disc.ExecuteNonQuery();
+                        }
+                    }
                 }
 
                 if (bidprice < int.Parse(money))
@@ -1202,15 +1381,14 @@ namespace hpl.Controllers
                     using (MySqlCommand cmd = hpup.CreateCommand())
                     {
                         hpup.Open();
-                        string bid = $"update item_{id} set money = " + price + " where " + 1;
-                        MySqlCommand bidp = new MySqlCommand(bid, hpup);
-                        bidp.ExecuteScalar();
+                        cmd.CommandText = $"insert ignore into bid (item_id,user_id,money,lastprice,time,lasttime) values(" + id + "," + int.Parse(Session["loginid"].ToString()) + ",'" + money + "','" + lastprice + "','" + time + "','" + lasttime + "')";
+                        cmd.ExecuteNonQuery();
 
-                        string exh = $"update exhibit set money = " + price + " where item_id = " + id;
-                        MySqlCommand exhi = new MySqlCommand(exh, hpup);
-                        exhi.ExecuteScalar();
+                        cmd.CommandText = $"update bid set money = " + price + " where user_id = " + Session["loginid"];
+                        cmd.ExecuteNonQuery();
 
-                        hpup.Close();
+                        cmd.CommandText = $"update exhibit set money = " + price + " where item_id = " + id;
+                        cmd.ExecuteNonQuery();
                         return RedirectToAction("AcList");
                     }
                 }
