@@ -95,7 +95,14 @@
         <div class="form-group">
             @Html.LabelFor(model => model.image, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <img src="data:image/jpg;base64,@Model.image" alt="image" style="max-width:100%;height:370px;" />
+                <img src="data:image/jpg;base64,@Model.image" alt="image" style="max-width:100%;height:370px;" data-toggle="modal" data-target="#image_myModal" />
+                <div class="modal fade" id="image_myModal">
+                    <div class="modal-dialog">
+                        <div class="modal-body">
+                            <img src="data:image/jpg;base64,@Model.image" alt="image">
+                        </div>
+                    </div>
+                </div>
                 <input type="file" class="file" name="file" />@ViewBag.imger
             </div>
         </div>

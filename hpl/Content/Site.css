@@ -22,3 +22,16 @@ select,
 textarea {
     max-width: 280px;
 }
+
+.modal-dialog {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100%;
+    margin: auto;
+    pointer-events: none
+}
+
+.modal-content {
+    pointer-events: all;
+}

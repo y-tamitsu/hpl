@@ -78,7 +78,14 @@
             @Html.DisplayNameFor(model => model.image)
         </dt>
         <dd>
-            <img src="data:image/jpg;base64,@Model.image" alt="image" style="max-width:100%;height:370px;" />
+            <img src="data:image/jpg;base64,@Model.image" alt="image" style="max-width:100%;height:370px;" data-toggle="modal" data-target="#image_myModal" />
+            <div class="modal fade" id="image_myModal">
+                <div class="modal-dialog">
+                    <div class="modal-body">
+                        <img src="data:image/jpg;base64,@Model.image" alt="image">
+                    </div>
+                </div>
+            </div>
         </dd>
     </dl>
     <div class="col-md-offset-2 col-md-10">

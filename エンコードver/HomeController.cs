@@ -135,35 +135,6 @@ namespace hpl.Controllers
             return View();
         }
 
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-            return View();
-        }
-
-
-
-        public ActionResult Logout()
-        {
-            ViewBag.Message = "Your Logout page.";
-            return View();
-        }
-
-        [HttpPost]
-        public ActionResult Logout(int kari)
-        {
-            ViewBag.Message = "Your Logout page.";
-            return View();
-        }
-
-
-
         //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //　ここからオークション
@@ -204,29 +175,31 @@ namespace hpl.Controllers
                 conn.Open();
                 using (MySqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $"select item_id,money,lastprice,time,lasttime,disc from exhibit where ( item_id = " + id + ")";
+                    cmd.CommandText = $"select * from exhibit where ( item_id = " + id + ")";
                     MySqlDataReader reader = cmd.ExecuteReader();
                     reader.Read();
-                    result = new userModel { id = int.Parse(reader["item_id"].ToString()), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]), disc = int.Parse(reader["disc"].ToString()) };
+                    result = new userModel { id = int.Parse(reader["item_id"].ToString()), title = reader["title"].ToString(), detail = reader["detail"].ToString(), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]), disc = int.Parse(reader["disc"].ToString()), image = System.Convert.ToBase64String((byte[])reader["image"]) };
                     return result;
                 }
             }
         }
 
-        public userModel Getexuserid(int id)
+        public List<string> Getexuserid(int id)
         {
             //Where id = idのSelect
             string hp = ConfigurationManager.ConnectionStrings["Hp"].ConnectionString;
-            var result = new userModel();
+            var result = new List<string>();
             using (MySqlConnection conn = new MySqlConnection(hp))
             {
                 conn.Open();
                 using (MySqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $"select item_id,money,lastprice,time,lasttime,image,disc from exhibit where ( user_id = " + id + ")";
+                    cmd.CommandText = $"select item_id from bid where ( user_id = " + id + ")";
                     MySqlDataReader reader = cmd.ExecuteReader();
-                    reader.Read();
-                    result = new userModel { id = int.Parse(reader["item_id"].ToString()), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]), image = System.Convert.ToBase64String((byte[])reader["image"]), disc = int.Parse(reader["disc"].ToString()) };
+                    while (reader.Read())
+                    {
+                        result.Add(reader["item_id"].ToString());
+                    }
                     return result;
                 }
             }
@@ -312,10 +285,10 @@ namespace hpl.Controllers
         }
 
         // user id による biddata
-        public List<userModel> Getuserbid(int id)
+        public userModel Getuserbid(int id)
         {
             string hp = ConfigurationManager.ConnectionStrings["Hp"].ConnectionString;
-            var result = new List<userModel>();
+            var result = new userModel();
             using (MySqlConnection conn = new MySqlConnection(hp))
             {
                 conn.Open();
@@ -324,10 +297,8 @@ namespace hpl.Controllers
                     cmd.CommandText = $"select * from bid where user_id = " + id;
                     MySqlDataReader reader = cmd.ExecuteReader();
 
-                    while (reader.Read())
-                    {
-                        result.Add(new userModel { id = int.Parse(reader["item_id"].ToString()), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]) });
-                    }
+                    reader.Read();
+                    result = (new userModel { id = int.Parse(reader["item_id"].ToString()), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]) });
                     return result;
                 }
             }
@@ -814,6 +785,8 @@ namespace hpl.Controllers
                 else if (ex == "bid")
                 {
                     var result = new List<userModel>();
+                    List<string> item_id = Getexuserid(int.Parse(Session["loginid"].ToString()));
+
                     using (MySqlConnection conn = new MySqlConnection(hp))
                     {
                         conn.Open();
@@ -821,16 +794,31 @@ namespace hpl.Controllers
                         {
                             if (bidend == null)
                             {
-                                cmd.CommandText = $"select * from bid where user_id = " + Session["loginid"] + " ORDER BY item_id ASC";
+                                foreach (string item in item_id)
+                                {
+                                    int it_id = Getexhibit(int.Parse(item)).id;
+                                    cmd.CommandText = $"select * from exhibit where (item_id = " + it_id + ") and (disc = " + 1 + ") ORDER BY item_id ASC";
+                                    MySqlDataReader reader = cmd.ExecuteReader();
+                                    while (reader.Read())
+                                    {
+                                        result.Add(new userModel { id = int.Parse(reader["item_id"].ToString()), title = reader["title"].ToString(), detail = reader["detail"].ToString(), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]), image = System.Convert.ToBase64String((byte[])reader["image"]) });
+                                    }
+                                    reader.Close();
+                                }
                             }
                             else
                             {
-                                cmd.CommandText = $"select * from bid where user_id = " + Session["loginid"] + " ORDER BY item_id ASC";
-                            }
-                            MySqlDataReader reader = cmd.ExecuteReader();
-                            while (reader.Read())
-                            {
-                                result.Add(new userModel { id = int.Parse(reader["item_id"].ToString()), title = Getexuserid(int.Parse(Session["loginid"].ToString())).title, detail = Getexuserid(int.Parse(Session["loginid"].ToString())).detail, money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]), image = Getexuserid(int.Parse(Session["loginid"].ToString())).image });
+                                foreach (string item in item_id)
+                                {
+                                    int it_id = Getexhibit(int.Parse(item)).id;
+                                    cmd.CommandText = $"select * from exhibit where item_id = " + it_id + " ORDER BY item_id ASC";
+                                    MySqlDataReader reader = cmd.ExecuteReader();
+                                    while (reader.Read())
+                                    {
+                                        result.Add(new userModel { id = int.Parse(reader["item_id"].ToString()), title = reader["title"].ToString(), detail = reader["detail"].ToString(), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]), image = System.Convert.ToBase64String((byte[])reader["image"]) });
+                                    }
+                                    reader.Close();
+                                }
                             }
                         }
                     }
@@ -872,7 +860,7 @@ namespace hpl.Controllers
                             {
                                 while (reader.Read())
                                 {
-                                    AcList.Add(new userModel { id = int.Parse(reader["item_id"].ToString()), title = reader["title"].ToString(), detail = reader["detail"].ToString(), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]), image = Getexuserid(int.Parse(Session["loginid"].ToString())).image });
+                                    AcList.Add(new userModel { id = int.Parse(reader["item_id"].ToString()), title = reader["title"].ToString(), detail = reader["detail"].ToString(), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]), image = System.Convert.ToBase64String((byte[])reader["image"]) });
                                 }
                             }
                         }
@@ -949,7 +937,6 @@ namespace hpl.Controllers
                 var files = Request.Files;
                 var time = Gettime(id).time;
                 var lasttime = Gettime(id).lasttime;
-                var img = GetAc(id).image;
 
                 if (file == null)
                 {
@@ -965,7 +952,7 @@ namespace hpl.Controllers
                     MySqlCommand edst = new MySqlCommand(edstr, hped);
                     edst.ExecuteScalar();
                 }
-                string edite = $"update bid set money = '" + model.money + "', lastprice = '" + model.lastprice + "'";
+                string edite = $"update bid set money = '" + model.money + "', lastprice = '" + model.lastprice + "' where item_id = " + id;
                 MySqlCommand edit = new MySqlCommand(edite, hped);
                 edit.ExecuteScalar();
                 hped.Close();
@@ -1024,8 +1011,36 @@ namespace hpl.Controllers
             return View();
         }
 
-
         //出品情報　削除
+        public ActionResult AcDelete(int id, string title, string detail, string money, string lastprice, DateTime time, DateTime lasttime)
+        {
+            try
+            {
+                ViewBag.id = id;
+                ViewBag.titl = title;
+                ViewBag.detail = detail;
+                ViewBag.money = money;
+                ViewBag.lastprice = lastprice;
+                ViewBag.time = time;
+                ViewBag.lasttime = lasttime;
+
+                return View(GetAc(id));
+            }
+            catch (System.Exception er)
+            {
+                byte[] error;
+                using (System.IO.MemoryStream ms = new MemoryStream())
+                using (System.IO.StreamWriter sw = new StreamWriter(ms, System.Text.Encoding.GetEncoding("utf-8")))
+                {
+                    string raw = er.ToString();
+                    sw.WriteLine(raw);
+                    sw.Flush();
+                    error = ms.ToArray();
+                }
+                return File(error, "text", "error.txt");
+            }
+        }
+        
         [HttpPost]
         public ActionResult AcDelete(int id, string title)
         {
@@ -1224,37 +1239,8 @@ namespace hpl.Controllers
                 hped.Close();
             }
         }
-
+        
         //ユーザー情報　削除
-        public ActionResult AcDelete(int id, string title, string detail, string money, string lastprice, DateTime time, DateTime lasttime)
-        {
-            try
-            {
-                ViewBag.id = id;
-                ViewBag.titl = title;
-                ViewBag.detail = detail;
-                ViewBag.money = money;
-                ViewBag.lastprice = lastprice;
-                ViewBag.time = time;
-                ViewBag.lasttime = lasttime;
-
-                return View(GetAc(id));
-            }
-            catch (System.Exception er)
-            {
-                byte[] error;
-                using (System.IO.MemoryStream ms = new MemoryStream())
-                using (System.IO.StreamWriter sw = new StreamWriter(ms, System.Text.Encoding.GetEncoding("utf-8")))
-                {
-                    string raw = er.ToString();
-                    sw.WriteLine(raw);
-                    sw.Flush();
-                    error = ms.ToArray();
-                }
-                return File(error, "text", "error.txt");
-            }
-        }
-
         public ActionResult AcuserDelete(int id, string name, string password, string mail, string remark)
         {
             try
@@ -1330,7 +1316,7 @@ namespace hpl.Controllers
             ViewBag.lastprice = model.lastprice;
             ViewBag.time = model.time;
             ViewBag.lasttime = model.lasttime;
-            return View(GetAc(model.id));
+            return View(GetAc(int.Parse(model.id.ToString())));
         }
 
         [HttpPost]
@@ -1342,8 +1328,9 @@ namespace hpl.Controllers
                 int price = 0;
                 money = Getexhibit(id).money;
                 lastprice = Getexhibit(id).lastprice;
-                time = Gettime(id).time.ToString();
+                DateTime nowtime = DateTime.Now;
                 lasttime = Gettime(id).lasttime.ToString();
+                Session["hope"] = bidprice;
                 if (bidprice >= int.Parse(lastprice))
                 {
                     //入札終了
@@ -1353,7 +1340,6 @@ namespace hpl.Controllers
                         using (MySqlCommand cmd = hpup.CreateCommand())
                         {
                             hpup.Open();
-
                             string dis = $"update exhibit set disc = " + 0 + " where item_id = " + id;
                             MySqlCommand disc = new MySqlCommand(dis, hpup);
                             disc.ExecuteNonQuery();
@@ -1374,17 +1360,15 @@ namespace hpl.Controllers
                     price = bidprice;
                 }
 
-
-
                 using (MySqlConnection hpup = new MySqlConnection(hp))
                 {
                     using (MySqlCommand cmd = hpup.CreateCommand())
                     {
                         hpup.Open();
-                        cmd.CommandText = $"insert ignore into bid (item_id,user_id,money,lastprice,time,lasttime) values(" + id + "," + int.Parse(Session["loginid"].ToString()) + ",'" + money + "','" + lastprice + "','" + time + "','" + lasttime + "')";
+                        cmd.CommandText = $"insert ignore into bid (item_id,user_id,money,lastprice,time,lasttime) values(" + id + "," + int.Parse(Session["loginid"].ToString()) + ",'" + money + "','" + lastprice + "','" + nowtime + "','" + lasttime + "')";
                         cmd.ExecuteNonQuery();
 
-                        cmd.CommandText = $"update bid set money = " + price + " where user_id = " + Session["loginid"];
+                        cmd.CommandText = $"update bid set money = " + price + " where (user_id = " + Session["loginid"] + ") and (item_id = " + id + " )";
                         cmd.ExecuteNonQuery();
 
                         cmd.CommandText = $"update exhibit set money = " + price + " where item_id = " + id;

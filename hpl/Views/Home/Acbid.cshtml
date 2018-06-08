@@ -34,7 +34,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.money, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                ：@ViewBag.money  <img src="~/aicon/next.jpg" width="38" height="30" style="margin-left:50px"><input type="text" name="bidprice" id="bidprice" style="margin-left:50px" placeholder="入札希望額">
+                ：@ViewBag.money
             </div>
         </div>
 
@@ -82,13 +82,46 @@
         <div class="form-group">
             <div class="control-label col-md-2"><b>image</b></div>
             <div class="col-md-10">
-
-                <img src="data:image/jpg;base64,@Model.image" alt="image" style="max-width:100%;height:370px;" />
+                <img src="data:image/jpg;base64,@Model.image" alt="image" style="max-width:100%;height:370px;" data-toggle="modal" data-target="#image_myModal" />
+                <div class="modal fade" id="image_myModal">
+                    <div class="modal-dialog">
+                        <div class="modal-body">
+                            <img src="data:image/jpg;base64,@Model.image" alt="image">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="入札" class="btn btn-default" />
+                <input type="button" value="入札" class="btn btn-default" data-toggle="modal" data-target="#modal-sample" />
+                <div class="modal" id="modal-sample" tabindex="-5">
+                    <div class="modal-dialog modal-lg" style="display:flex;flex-direction:column;justify-content:center;margin:auto;pointer-events:none;">
+
+                        <!-- 3.モーダルのコンテンツ -->
+                        <div class="modal-content" style="pointer-events: all">
+                            <!-- 4.モーダルのヘッダ -->
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <h4 class="modal-title" id="modal-label">入札画面</h4>
+                            </div>
+                            <!-- 5.モーダルのボディ -->
+                            <div class="modal-body">
+                                @Html.LabelFor(model => model.money, htmlAttributes: new { @class = "control-label col-md-2" })：@ViewBag.money
+                                <input type="text" name="bidprice" id="bidprice" placeholder="入札希望額" style="" class="text-center">
+                                <img src="data:image/jpg;base64,@Model.image" alt="image" style="max-width:70%;height:250px;">
+                            </div>
+                            <!-- 6.モーダルのフッタ -->
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+                                <button type="submit" class="btn btn-primary">入札</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <input type="button" value="キャンセル" class="btn btn-default" onclick="location.href = 'http://localhost:49405/Home/AcList'" />
             </div>
         </div>
