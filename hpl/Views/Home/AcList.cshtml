@@ -8,17 +8,10 @@
 
 @using (Html.BeginForm())
 {
+    @ViewBag.bider
     <div class="d1" style="float:left;margin-right:10px;">
         <input type="radio" name="select" value="and" checked="@Session["and"]">AND
         <input type="radio" name="select" value="or" checked="@Session["or"]">OR
-    </div>
-    <div class="div2" style="float:left;margin-right:10px;margin-right:10px;">
-        <select name="ex">
-            <option value="non" @Session["non"]> 選択してください </option>
-            <option value="all" @Session["all"]> 全て </option>
-            <option value="exh" @Session["exh"]> 出品 </option>
-            <option value="bid" @Session["bid"]> 入札 </option>
-        </select>
     </div>
 
     <div class="div3" style="float:left;margin-right:10px;">
@@ -27,15 +20,26 @@
             <option value="day" @Session["day"]> 出品登録日 </option>
             <option value="tit" @Session["tit"]> タイトル </option>
         </select>
-        <select name="acde" style="margin-left:5px">
+        <select name="acde" style="float:left;margin-right:10px">
             <option value="asc" @Session["asc"]> 昇順 </option>
             <option value="des" @Session["des"]> 降順 </option>
         </select>
     </div>
 
-    <div class="div4" style="margin-right:10px;">
-        <input type="checkbox" name="bidend" value="bidend" checked="@Session["bidend"]" style="margin-left:5px;">入札終了を表示
+    <div class="div4" style="float:left;margin-right:10px;">
+        <input type="checkbox" name="bidend" value="bidend" checked="@Session["bidend"]" style="margin-right:10px;">入札終了を表示
     </div>
+
+    <div class="div2" style="float:right">
+        <select name="ex">
+            <option value="non" @Session["non"]> 選択してください </option>
+            <option value="all" @Session["all"]> 全て </option>
+            <option value="exh" @Session["exh"]> 出品 </option>
+            <option value="bid" @Session["bid"]> 入札 </option>
+        </select>
+    </div>
+    <br>
+
     <p>
         <div class="form" style="position:relative;">
             <select name="example1">

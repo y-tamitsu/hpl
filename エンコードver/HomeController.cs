@@ -362,6 +362,7 @@ namespace hpl.Controllers
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
         //出品情報　登録
         public ActionResult ExhibitReg()
         {
@@ -1040,7 +1041,7 @@ namespace hpl.Controllers
                 return File(error, "text", "error.txt");
             }
         }
-        
+
         [HttpPost]
         public ActionResult AcDelete(int id, string title)
         {
@@ -1239,7 +1240,7 @@ namespace hpl.Controllers
                 hped.Close();
             }
         }
-        
+
         //ユーザー情報　削除
         public ActionResult AcuserDelete(int id, string name, string password, string mail, string remark)
         {
@@ -1331,6 +1332,7 @@ namespace hpl.Controllers
                 DateTime nowtime = DateTime.Now;
                 lasttime = Gettime(id).lasttime.ToString();
                 Session["hope"] = bidprice;
+                Session["item_id"] = id;
                 if (bidprice >= int.Parse(lastprice))
                 {
                     //入札終了
@@ -1349,7 +1351,8 @@ namespace hpl.Controllers
 
                 if (bidprice < int.Parse(money))
                 {
-                    price = bidprice + 100;
+                    ViewBag.bider = "現在の金額では入札できません";
+                    price = int.Parse(money);
                 }
                 else if (bidprice > int.Parse(money))
                 {
