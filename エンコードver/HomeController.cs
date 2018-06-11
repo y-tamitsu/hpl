@@ -151,7 +151,7 @@ namespace hpl.Controllers
                 conn.Open();
                 using (MySqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $"select * from exhibit ORDER BY item_id ASC";
+                    cmd.CommandText = $"select * from exhibit ORDER BY item_id ASC FOR UPDATE";
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
@@ -175,7 +175,7 @@ namespace hpl.Controllers
                 conn.Open();
                 using (MySqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $"select * from exhibit where ( item_id = " + id + ")";
+                    cmd.CommandText = $"select * from exhibit where ( item_id = " + id + ")" + "FOR UPDATE";
                     MySqlDataReader reader = cmd.ExecuteReader();
                     reader.Read();
                     result = new userModel { id = int.Parse(reader["item_id"].ToString()), title = reader["title"].ToString(), detail = reader["detail"].ToString(), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString(), time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]), disc = int.Parse(reader["disc"].ToString()), image = System.Convert.ToBase64String((byte[])reader["image"]) };
@@ -194,7 +194,7 @@ namespace hpl.Controllers
                 conn.Open();
                 using (MySqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $"select item_id from bid where ( user_id = " + id + ")";
+                    cmd.CommandText = $"select item_id from bid where ( user_id = " + id + ")" + "FOR UPDATE";
                     MySqlDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
@@ -216,7 +216,7 @@ namespace hpl.Controllers
                 conn.Open();
                 using (MySqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $"select item_id,money,lastprice from exhibit where ( time = '" + time + "')";
+                    cmd.CommandText = $"select item_id,money,lastprice from exhibit where ( time = '" + time + "')" + "FOR UPDATE";
                     MySqlDataReader reader = cmd.ExecuteReader();
                     reader.Read();
                     result = new userModel { id = int.Parse(reader["item_id"].ToString()), money = reader["money"].ToString(), lastprice = reader["lastprice"].ToString() };
@@ -236,7 +236,7 @@ namespace hpl.Controllers
                 conn.Open();
                 using (MySqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $"select image from exhibit where ( item_id = " + id + ")";
+                    cmd.CommandText = $"select image from exhibit where ( item_id = " + id + ")" + "FOR UPDATE";
                     MySqlDataReader reader = cmd.ExecuteReader();
                     reader.Read();
                     result = new userModel { image = System.Convert.ToBase64String((byte[])reader["image"]) };
@@ -256,7 +256,7 @@ namespace hpl.Controllers
                 conn.Open();
                 using (MySqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $"select time,lasttime from exhibit where item_id = " + id;
+                    cmd.CommandText = $"select time,lasttime from exhibit where item_id = " + id + "FOR UPDATE";
                     MySqlDataReader reader = cmd.ExecuteReader();
                     reader.Read();
                     result = new userModel { time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]) };
@@ -275,7 +275,7 @@ namespace hpl.Controllers
                 conn.Open();
                 using (MySqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $"select * from acuser where user_id = " + id;
+                    cmd.CommandText = $"select * from acuser where user_id = " + id + "FOR UPDATE";
                     MySqlDataReader reader = cmd.ExecuteReader();
                     reader.Read();
                     result = new userModel { id = int.Parse(reader["user_id"].ToString()), name = reader["name"].ToString(), password = reader["password"].ToString(), mail = reader["email"].ToString(), remark = reader["remark"].ToString() };
@@ -294,7 +294,7 @@ namespace hpl.Controllers
                 conn.Open();
                 using (MySqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $"select * from bid where user_id = " + id;
+                    cmd.CommandText = $"select * from bid where user_id = " + id + "FOR UPDATE";
                     MySqlDataReader reader = cmd.ExecuteReader();
 
                     reader.Read();
@@ -326,7 +326,7 @@ namespace hpl.Controllers
                     conn.Open();
                     using (MySqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = $"SELECT* FROM acuser where user_id = " + id + " and password = '" + password + "' ORDER BY user_id ASC;";
+                        cmd.CommandText = $"SELECT* FROM acuser where user_id = " + id + " and password = '" + password + "' ORDER BY user_id ASC FOR UPDATE";
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read() == true)
@@ -431,7 +431,7 @@ namespace hpl.Controllers
                     conn.Open();
                     using (MySqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = $"select * from exhibit ORDER BY item_id ASC;";
+                        cmd.CommandText = $"select * from exhibit ORDER BY item_id ASC FOR UPDATE";
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -641,11 +641,11 @@ namespace hpl.Controllers
                                 {
                                     if (bidend == null)
                                     {
-                                        cmd.CommandText = $"select * from exhibit {comand} and (disc = " + 1 + ") ORDER BY item_id ASC";
+                                        cmd.CommandText = $"select * from exhibit {comand} and (disc = " + 1 + ") ORDER BY item_id ASC FOR UPDATE";
                                     }
                                     else
                                     {
-                                        cmd.CommandText = $"select * from exhibit {comand} ORDER BY item_id ASC";
+                                        cmd.CommandText = $"select * from exhibit {comand} ORDER BY item_id ASC FOR UPDATE";
                                     }
                                     using (MySqlDataReader reader = cmd.ExecuteReader())
                                     {
@@ -703,11 +703,11 @@ namespace hpl.Controllers
                             {
                                 if (bidend == null)
                                 {
-                                    cmd.CommandText = $"select * from exhibit {comand} and (disc = " + 1 + ") ORDER BY item_id ASC";
+                                    cmd.CommandText = $"select * from exhibit {comand} and (disc = " + 1 + ") ORDER BY item_id ASC FOR UPDATE";
                                 }
                                 else
                                 {
-                                    cmd.CommandText = $"select * from exhibit {comand} ORDER BY item_id ASC";
+                                    cmd.CommandText = $"select * from exhibit {comand} ORDER BY item_id ASC FOR UPDATE";
                                 }
                                 using (MySqlDataReader reader = cmd.ExecuteReader())
                                 {
@@ -750,11 +750,11 @@ namespace hpl.Controllers
                         {
                             if (bidend == null)
                             {
-                                cmd.CommandText = $"select * from exhibit where user_id = " + Session["loginid"] + " and (disc = " + 1 + ") ORDER BY item_id ASC";
+                                cmd.CommandText = $"select * from exhibit where user_id = " + Session["loginid"] + " and (disc = " + 1 + ") ORDER BY item_id ASC FOR UPDATE";
                             }
                             else
                             {
-                                cmd.CommandText = $"select * from exhibit where user_id = " + Session["loginid"] + " ORDER BY item_id ASC";
+                                cmd.CommandText = $"select * from exhibit where user_id = " + Session["loginid"] + " ORDER BY item_id ASC FOR UPDATE";
                             }
                             MySqlDataReader reader = cmd.ExecuteReader();
 
@@ -798,7 +798,7 @@ namespace hpl.Controllers
                                 foreach (string item in item_id)
                                 {
                                     int it_id = Getexhibit(int.Parse(item)).id;
-                                    cmd.CommandText = $"select * from exhibit where (item_id = " + it_id + ") and (disc = " + 1 + ") ORDER BY item_id ASC";
+                                    cmd.CommandText = $"select * from exhibit where (item_id = " + it_id + ") and (disc = " + 1 + ") ORDER BY item_id ASC FOR UPDATE";
                                     MySqlDataReader reader = cmd.ExecuteReader();
                                     while (reader.Read())
                                     {
@@ -812,7 +812,7 @@ namespace hpl.Controllers
                                 foreach (string item in item_id)
                                 {
                                     int it_id = Getexhibit(int.Parse(item)).id;
-                                    cmd.CommandText = $"select * from exhibit where item_id = " + it_id + " ORDER BY item_id ASC";
+                                    cmd.CommandText = $"select * from exhibit where item_id = " + it_id + " ORDER BY item_id ASC FOR UPDATE";
                                     MySqlDataReader reader = cmd.ExecuteReader();
                                     while (reader.Read())
                                     {
@@ -851,11 +851,11 @@ namespace hpl.Controllers
                         {
                             if (bidend == null)
                             {
-                                cmd.CommandText = $"select * from exhibit where disc = " + 1 + " ORDER BY item_id ASC";
+                                cmd.CommandText = $"select * from exhibit where disc = " + 1 + " ORDER BY item_id ASC FOR UPDATE";
                             }
                             else
                             {
-                                cmd.CommandText = $"select * from exhibit ORDER BY item_id ASC";
+                                cmd.CommandText = $"select * from exhibit ORDER BY item_id ASC FOR UPDATE";
                             }
                             using (MySqlDataReader reader = cmd.ExecuteReader())
                             {
@@ -1089,10 +1089,21 @@ namespace hpl.Controllers
         }
 
         [HttpPost]
-        public ActionResult AcRegistration(userModel model)
+        public ActionResult AcRegistration(userModel model, string exhibit, string bid, string all, string registration)
         {
+            Session["exhibit"] = "null";
+            Session["bid"] = "null";
+            Session["all"] = "null";
+            Session["registration"] = "null";
+
             try
             {
+                if (bid == "on")
+                {
+
+                }
+
+
                 string ihp = ConfigurationManager.ConnectionStrings["Hp"].ConnectionString;
 
                 using (MySqlConnection hpin = new MySqlConnection(ihp))
@@ -1100,7 +1111,7 @@ namespace hpl.Controllers
                     hpin.Open();
                     using (MySqlCommand cmd = hpin.CreateCommand())
                     {
-                        cmd.CommandText = @"select * from acuser where ( user_id = " + model.id + ")";
+                        cmd.CommandText = @"select * from acuser where ( user_id = " + model.id + ")" + " FOR UPDATE";
                         using (MySqlDataReader sel = cmd.ExecuteReader())
                         {
                             if (sel.Read() == true)
@@ -1148,7 +1159,7 @@ namespace hpl.Controllers
                     conn.Open();
                     using (MySqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = $"select * from acuser ORDER BY user_id ASC;";
+                        cmd.CommandText = $"select * from acuser ORDER BY user_id ASC FOR UPDATE";
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -1360,7 +1371,7 @@ namespace hpl.Controllers
                 }
                 else if (bidprice == int.Parse(money))
                 {
-                    price = bidprice;
+                    price = int.Parse(money);
                 }
 
                 using (MySqlConnection hpup = new MySqlConnection(hp))
