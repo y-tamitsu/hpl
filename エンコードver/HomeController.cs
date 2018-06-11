@@ -1098,38 +1098,73 @@ namespace hpl.Controllers
 
             try
             {
-                if (bid == "on")
-                {
-
-                }
-
-
                 string ihp = ConfigurationManager.ConnectionStrings["Hp"].ConnectionString;
 
-                using (MySqlConnection hpin = new MySqlConnection(ihp))
+                if (bid == "on")
                 {
-                    hpin.Open();
-                    using (MySqlCommand cmd = hpin.CreateCommand())
+                    using (MySqlConnection hpin = new MySqlConnection(ihp))
                     {
-                        cmd.CommandText = @"select * from acuser where ( user_id = " + model.id + ")" + " FOR UPDATE";
-                        using (MySqlDataReader sel = cmd.ExecuteReader())
+                        hpin.Open();
+                        using (MySqlCommand cmd = hpin.CreateCommand())
                         {
-                            if (sel.Read() == true)
-                            {
-                                ModelState.AddModelError(string.Empty, "入力したユーザーIDは既に使用されています。");
-                                return View();
-                            }
-                            else
-                            {
-                                sel.Close();
-                                cmd.CommandText = @"insert ignore into acuser (user_id,name,password,email,remark) values(" + model.id + ",'" + model.name + "','" + model.password + "','" + model.mail + "','" + model.remark + "')";
-                                cmd.ExecuteNonQuery();
-                                return RedirectToAction("AcuserList");
+                            cmd.CommandText = @"insert ignore into user_auth (user_id,auth) values(" + model.id + "," + 1 + ")";
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                }
 
+                else if (exhibit == "on")
+                {
+                    using (MySqlConnection hpin = new MySqlConnection(ihp))
+                    {
+                        hpin.Open();
+                        using (MySqlCommand cmd = hpin.CreateCommand())
+                        {
+                            cmd.CommandText = @"insert ignore into user_auth (user_id,auth) values(" + model.id + "," + 2 + ")";
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                }
+                else if (registration == "on")
+                {
+                    using (MySqlConnection hpin = new MySqlConnection(ihp))
+                    {
+                        hpin.Open();
+                        using (MySqlCommand cmd = hpin.CreateCommand())
+                        {
+                            cmd.CommandText = @"insert ignore into user_auth (user_id,auth) values(" + model.id + "," + 3 + ")";
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                }
+                else
+                {
+                    using (MySqlConnection hpin = new MySqlConnection(ihp))
+                    {
+                        hpin.Open();
+                        using (MySqlCommand cmd = hpin.CreateCommand())
+                        {
+                            cmd.CommandText = @"select * from acuser where ( user_id = " + model.id + ")" + " FOR UPDATE";
+                            using (MySqlDataReader sel = cmd.ExecuteReader())
+                            {
+                                if (sel.Read() == true)
+                                {
+                                    ModelState.AddModelError(string.Empty, "入力したユーザーIDは既に使用されています。");
+                                    return View();
+                                }
+                                else
+                                {
+                                    sel.Close();
+                                    cmd.CommandText = @"insert ignore into acuser (user_id,name,password,email,remark) values(" + model.id + ",'" + model.name + "','" + model.password + "','" + model.mail + "','" + model.remark + "')";
+                                    cmd.ExecuteNonQuery();
+                                    return RedirectToAction("AcuserList");
+
+                                }
                             }
                         }
                     }
                 }
+                return RedirectToAction("AcuserList");
             }
             catch (System.Exception er)
             {
