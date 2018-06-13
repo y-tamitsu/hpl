@@ -103,12 +103,13 @@
                         </div>
                     </div>
                 </div>
-                <input type="file" class="file" name="file" />@ViewBag.imger
+                <input type="file" id="exhibitimage" name="file" accept="image/*" style="display:none;float:left;" />
+                <div><img id="camouflage" src="~/aicon/image_inport.jpg" style="width:40px;height:30px;" onClick="$('#exhibitimage').click()"></div>
             </div>
         </div>
 
         <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
+            <div class="col-md-offset-2 col-md-10" style="text-align: center;">
                 <input type="submit" value="保存" class="btn btn-default" />
                 <input type="button" value="キャンセル" onclick="location.href='http://localhost:49405/Home/AcList'" class="btn btn-default" />
             </div>

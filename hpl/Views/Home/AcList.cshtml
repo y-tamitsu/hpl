@@ -84,7 +84,7 @@
     </div>
 </p>
 @*更新*@
-<div class="translate" style="float:left;margin-right:10px">
+<div class="translate" style="float:left;margin-right:10px;">
     <button type="button"><img src="~/aicon/translate.png" alt="translate" width="20" height="22" onclick="location.href = 'http://localhost:49405/Home/AcList'" /></button>
 </div>
 
@@ -156,7 +156,7 @@
                     @Html.ActionLink("Delete", "AcDelete", new { id = item.id, title = item.title, detail = item.detail, money = item.money, lastprice = item.lastprice, time = item.time, lasttime = item.lasttime })
                 </h6>
 
-            </figcaption><a href="#"></a>
+            </figcaption>
         </figure>
         <style id="fig">
             .list {
@@ -170,7 +170,7 @@
                 width: 100%;
                 color: #ffffff;
                 font-size: 16px;
-                text-align: left;
+                text-align: center;
             }
 
                 .list * {
@@ -346,4 +346,3 @@
         </style>
     }
 </div>
-

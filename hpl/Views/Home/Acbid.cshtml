@@ -94,7 +94,7 @@
         </div>
 
         <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
+            <div class="col-md-offset-2 col-md-10" style="text-align: center;">
                 <input type="button" value="入札" class="btn btn-default" data-toggle="modal" data-target="#modal-sample" />
                 <div class="modal" id="modal-sample" tabindex="-5">
                     <div class="modal-dialog modal-lg" style="display:flex;flex-direction:column;justify-content:center;margin:auto;pointer-events:none;">
@@ -110,33 +110,21 @@
                             </div>
                             <!-- 5.モーダルのボディ -->
                             <div class="modal-body">
-                                @Html.LabelFor(model => model.money, htmlAttributes: new { @class = "control-label col-md-2" })：@ViewBag.money
-                                <input type="text" name="bidprice" id="bidprice" placeholder="入札希望額" style="" class="text-center" onsubmit="bidprice()">
-                                <script>
-                                    function bidprice() {
-                                        var p = document.getElementById("bidprice").value;
-
-                                        target = document.getElementById("bidprice");
-                                        target.innerText = document.forms.id_form1.id_textBox1.value;
-                                        @*if (document.forms.item p < @ViewBag.money)
-                                            alert("@ViewBag.bider");
-                                        else {
-                                        }*@
-                                    }
-
-                                </script>
-
-                                <img src="data:image/jpg;base64,@Model.image" alt="image" style="max-width:70%;height:250px;">
+                                @Html.LabelFor(model => model.money, htmlAttributes: new { @class = "control-label col-md-2" })：@ViewBag.bider
+                                <input type="text" name="bidprice" id="bidprice" placeholder="入札希望額" style="right:50%" class="text-center" required>
+                                <br>
+                                <br>
+                                <img src="data:image/jpg;base64,@Model.image" alt="image" style="max-width:100%;height:400px;text-align:center;">
                             </div>
                             <!-- 6.モーダルのフッタ -->
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
                                 <button type="submit" class="btn btn-primary">入札</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <input type="button" value="キャンセル" class="btn btn-default" onclick="location.href = 'http://localhost:49405/Home/AcList'" />
+                <input type="button" value="キャンセル" class="btn btn-default" onclick="location.href = 'http://localhost:49405/Home/AcList'" style="text-align: center;" />
             </div>
         </div>
     </div>

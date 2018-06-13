@@ -6,10 +6,7 @@ using MySql.Data.MySqlClient;
 using System.Configuration;
 using hpl.Models;
 using System.IO;
-using System.Linq;
 using System.Web;
-using System.Drawing;
-using System.Net;
 
 namespace hpl.Controllers
 {
@@ -138,7 +135,6 @@ namespace hpl.Controllers
         //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //　ここからオークション
-
         // item selectメソッド
         public List<userModel> GetAcList()
         {
@@ -256,7 +252,7 @@ namespace hpl.Controllers
                 conn.Open();
                 using (MySqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $"select time,lasttime from exhibit where item_id = " + id + "FOR UPDATE";
+                    cmd.CommandText = $"select time,lasttime from exhibit where item_id = " + id + " FOR UPDATE";
                     MySqlDataReader reader = cmd.ExecuteReader();
                     reader.Read();
                     result = new userModel { time = Convert.ToDateTime(reader["time"]), lasttime = Convert.ToDateTime(reader["lasttime"]) };
@@ -306,7 +302,6 @@ namespace hpl.Controllers
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
         //ログイン
         public ActionResult AcLogin()
         {
@@ -362,10 +357,10 @@ namespace hpl.Controllers
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
         //出品情報　登録
         public ActionResult ExhibitReg()
         {
+            ViewBag.imger = "画像を選択してください";
             return View();
         }
 
@@ -377,14 +372,13 @@ namespace hpl.Controllers
                 var files = Request.Files;
                 DateTime nowtime = DateTime.Now;
                 DateTime weektime = nowtime.AddDays(7);
-                string path = System.IO.Path.GetFileName(file.FileName);
-                if (file.FileName == "")
+                if (file == null)
                 {
-                    ViewBag.imger = "エラーです";
+                    return RedirectToAction("ExhibitReg");
                 }
                 else
                 {
-                    file.SaveAs("C:\\UploadedFiles\\" + path);
+                    file.SaveAs("C:\\UploadedFiles\\" + System.IO.Path.GetFileName(file.FileName));
                 }
 
                 string hp = ConfigurationManager.ConnectionStrings["Hp"].ConnectionString;
@@ -394,7 +388,7 @@ namespace hpl.Controllers
                     {
                         hpin.Open();
 
-                        cmd.CommandText = @"insert ignore into exhibit (user_id,title,detail,money,lastprice,time,lasttime,image) values(" + int.Parse(Session["loginid"].ToString()) + ",'" + model.title + "','" + model.detail + "','" + model.money + "','" + model.lastprice + "','" + nowtime + "','" + weektime + "',load_file(" + "'C:/UploadedFiles/" + path + "'))";
+                        cmd.CommandText = @"insert ignore into exhibit (user_id,title,detail,money,lastprice,time,lasttime,image) values(" + int.Parse(Session["loginid"].ToString()) + ",'" + model.title + "','" + model.detail + "','" + model.money + "','" + model.lastprice + "','" + nowtime + "','" + weektime + "',load_file(" + "'C:/UploadedFiles/" + System.IO.Path.GetFileName(file.FileName) + "'))";
                         cmd.ExecuteNonQuery();
                         return RedirectToAction("AcList");
                     }
@@ -1372,13 +1366,24 @@ namespace hpl.Controllers
             try
             {
                 string hp = ConfigurationManager.ConnectionStrings["Hp"].ConnectionString;
-                int price = 0;
+                int price = 0, price2 = 0, maxprice = 0;
                 money = Getexhibit(id).money;
                 lastprice = Getexhibit(id).lastprice;
                 DateTime nowtime = DateTime.Now;
                 lasttime = Gettime(id).lasttime.ToString();
                 Session["hope"] = bidprice;
                 Session["item_id"] = id;
+
+                using (MySqlConnection hpup = new MySqlConnection(hp))
+                {
+                    using (MySqlCommand cmd = hpup.CreateCommand())
+                    {
+                        hpup.Open();
+                        cmd.CommandText = $"insert ignore into bid (item_id,user_id,money,lastprice,time,lasttime) values(" + id + "," + int.Parse(Session["loginid"].ToString()) + ",'" + money + "','" + lastprice + "','" + nowtime + "','" + lasttime + "')";
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
                 if (bidprice >= int.Parse(lastprice))
                 {
                     //入札終了
@@ -1391,6 +1396,7 @@ namespace hpl.Controllers
                             string dis = $"update exhibit set disc = " + 0 + " where item_id = " + id;
                             MySqlCommand disc = new MySqlCommand(dis, hpup);
                             disc.ExecuteNonQuery();
+                            return RedirectToAction("AcList");
                         }
                     }
                 }
@@ -1398,12 +1404,36 @@ namespace hpl.Controllers
                 if (bidprice < int.Parse(money))
                 {
                     ViewBag.bider = "現在の金額では入札できません";
-                    price = int.Parse(money);
+                    return RedirectToAction("AcList");
                 }
                 else if (bidprice > int.Parse(money))
                 {
-                    price = int.Parse(money) + 100;
+                    using (MySqlConnection hpup = new MySqlConnection(hp))
+                    {
+                        using (MySqlCommand cmd = hpup.CreateCommand())
+                        {
+                            hpup.Open();
+                            cmd.CommandText = $"select user_id,max(money) from bid where item_id = " + id;
+                            MySqlDataReader reader = cmd.ExecuteReader();
+                            reader.Read();
+                            maxprice = int.Parse(reader["max(money)"].ToString());
+                            reader.Close();
+
+                            if (bidprice > maxprice)//入札商品最高額取得
+                            {
+                                cmd.CommandText = $"update bid set money = " + bidprice + " where (user_id = " + Session["loginid"] + ") and (item_id = " + id + " )";
+                                cmd.ExecuteNonQuery();
+                            }
+                            else if (bidprice < maxprice)
+                            {
+                                cmd.CommandText = $"update bid set money = " + maxprice + " where (user_id = " + Session["loginid"] + ") and (item_id = " + id + " )";
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                    price = maxprice + 100;
                 }
+
                 else if (bidprice == int.Parse(money))
                 {
                     price = int.Parse(money);
@@ -1414,12 +1444,6 @@ namespace hpl.Controllers
                     using (MySqlCommand cmd = hpup.CreateCommand())
                     {
                         hpup.Open();
-                        cmd.CommandText = $"insert ignore into bid (item_id,user_id,money,lastprice,time,lasttime) values(" + id + "," + int.Parse(Session["loginid"].ToString()) + ",'" + money + "','" + lastprice + "','" + nowtime + "','" + lasttime + "')";
-                        cmd.ExecuteNonQuery();
-
-                        cmd.CommandText = $"update bid set money = " + price + " where (user_id = " + Session["loginid"] + ") and (item_id = " + id + " )";
-                        cmd.ExecuteNonQuery();
-
                         cmd.CommandText = $"update exhibit set money = " + price + " where item_id = " + id;
                         cmd.ExecuteNonQuery();
                         return RedirectToAction("AcList");

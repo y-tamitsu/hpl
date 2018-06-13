@@ -14,15 +14,7 @@
     <div class="form-horizontal">
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-
-        @*<div class="form-group">
-            @Html.LabelFor(model => model.id, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.id, new { htmlAttributes = new { @class = "form-control" } })
-        *@
         @Html.ValidationMessageFor(model => model.id, "", new { @class = "text-danger" })
-        @*</div>
-            </div>*@
 
         <div class="form-group">
             @Html.LabelFor(model => model.title, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -62,7 +54,9 @@
             @Html.LabelFor(model => model.image, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 <div class="form-horizontal">
-                    <input type="file" class="file" name="file" /> @ViewBag.imger
+                    <input type="file" id="exhibitimage" name="file" accept="image/*" style="display:none;float:left;" />
+                    <div><img id="camouflage" src="~/aicon/image_inport.jpg" style="width:40px;height:30px;" onClick="$('#exhibitimage').click()"></div>@ViewBag.imger
+                    <br>
                     <input type="submit" value="出品" class="btn btn-default" style="margin-top:15px" />
                     <input type="button" value="キャンセル" class="btn btn-default" style="margin-top:15px" onclick="location.href = 'http://localhost:49405/'" />
                 </div>
