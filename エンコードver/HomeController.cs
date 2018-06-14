@@ -360,7 +360,6 @@ namespace hpl.Controllers
         //出品情報　登録
         public ActionResult ExhibitReg()
         {
-            ViewBag.imger = "画像を選択してください";
             return View();
         }
 
@@ -947,7 +946,7 @@ namespace hpl.Controllers
                     MySqlCommand edst = new MySqlCommand(edstr, hped);
                     edst.ExecuteScalar();
                 }
-                string edite = $"update bid set money = '" + model.money + "', lastprice = '" + model.lastprice + "' where item_id = " + id;
+                string edite = $"update bid set lastprice = '" + model.lastprice + "' where item_id = " + id;
                 MySqlCommand edit = new MySqlCommand(edite, hped);
                 edit.ExecuteScalar();
                 hped.Close();
@@ -1366,7 +1365,7 @@ namespace hpl.Controllers
             try
             {
                 string hp = ConfigurationManager.ConnectionStrings["Hp"].ConnectionString;
-                int price = 0, price2 = 0, maxprice = 0;
+                int price = 0, maxprice = 0, age = 0;
                 money = Getexhibit(id).money;
                 lastprice = Getexhibit(id).lastprice;
                 DateTime nowtime = DateTime.Now;
@@ -1379,7 +1378,7 @@ namespace hpl.Controllers
                     using (MySqlCommand cmd = hpup.CreateCommand())
                     {
                         hpup.Open();
-                        cmd.CommandText = $"insert ignore into bid (item_id,user_id,money,lastprice,time,lasttime) values(" + id + "," + int.Parse(Session["loginid"].ToString()) + ",'" + money + "','" + lastprice + "','" + nowtime + "','" + lasttime + "')";
+                        cmd.CommandText = $"insert ignore into bid (item_id,user_id,money,lastprice,time,lasttime) values(" + id + "," + int.Parse(Session["loginid"].ToString()) + ",'" + bidprice + "','" + lastprice + "','" + nowtime + "','" + lasttime + "')";
                         cmd.ExecuteNonQuery();
                     }
                 }
@@ -1393,7 +1392,7 @@ namespace hpl.Controllers
                         using (MySqlCommand cmd = hpup.CreateCommand())
                         {
                             hpup.Open();
-                            string dis = $"update exhibit set disc = " + 0 + " where item_id = " + id;
+                            string dis = $"update exhibit set money = " + lastprice + " disc = " + 0 + " where item_id = " + id;
                             MySqlCommand disc = new MySqlCommand(dis, hpup);
                             disc.ExecuteNonQuery();
                             return RedirectToAction("AcList");
@@ -1416,6 +1415,7 @@ namespace hpl.Controllers
                             cmd.CommandText = $"select user_id,max(money) from bid where item_id = " + id;
                             MySqlDataReader reader = cmd.ExecuteReader();
                             reader.Read();
+                            age = int.Parse(reader["user_id"].ToString());
                             maxprice = int.Parse(reader["max(money)"].ToString());
                             reader.Close();
 
@@ -1426,12 +1426,12 @@ namespace hpl.Controllers
                             }
                             else if (bidprice < maxprice)
                             {
-                                cmd.CommandText = $"update bid set money = " + maxprice + " where (user_id = " + Session["loginid"] + ") and (item_id = " + id + " )";
+                                cmd.CommandText = $"update exhibit set money = " + bidprice + "+" + 100 + " where item_id = " + id;
                                 cmd.ExecuteNonQuery();
+                                return RedirectToAction("AcList");
                             }
                         }
                     }
-                    price = maxprice + 100;
                 }
 
                 else if (bidprice == int.Parse(money))
@@ -1444,7 +1444,7 @@ namespace hpl.Controllers
                     using (MySqlCommand cmd = hpup.CreateCommand())
                     {
                         hpup.Open();
-                        cmd.CommandText = $"update exhibit set money = " + price + " where item_id = " + id;
+                        cmd.CommandText = $"update exhibit set money = " + int.Parse(money) + "+" + 100 + " where item_id = " + id;
                         cmd.ExecuteNonQuery();
                         return RedirectToAction("AcList");
                     }
