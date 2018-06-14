@@ -1365,23 +1365,13 @@ namespace hpl.Controllers
             try
             {
                 string hp = ConfigurationManager.ConnectionStrings["Hp"].ConnectionString;
-                int price = 0, maxprice = 0, age = 0;
+                int price = 0, maxprice = 0, age = 0, i = 0;
                 money = Getexhibit(id).money;
                 lastprice = Getexhibit(id).lastprice;
                 DateTime nowtime = DateTime.Now;
                 lasttime = Gettime(id).lasttime.ToString();
                 Session["hope"] = bidprice;
                 Session["item_id"] = id;
-
-                using (MySqlConnection hpup = new MySqlConnection(hp))
-                {
-                    using (MySqlCommand cmd = hpup.CreateCommand())
-                    {
-                        hpup.Open();
-                        cmd.CommandText = $"insert ignore into bid (item_id,user_id,money,lastprice,time,lasttime) values(" + id + "," + int.Parse(Session["loginid"].ToString()) + ",'" + bidprice + "','" + lastprice + "','" + nowtime + "','" + lasttime + "')";
-                        cmd.ExecuteNonQuery();
-                    }
-                }
 
                 if (bidprice >= int.Parse(lastprice))
                 {
@@ -1392,7 +1382,7 @@ namespace hpl.Controllers
                         using (MySqlCommand cmd = hpup.CreateCommand())
                         {
                             hpup.Open();
-                            string dis = $"update exhibit set money = " + lastprice + " disc = " + 0 + " where item_id = " + id;
+                            string dis = $"update exhibit set money = " + lastprice + ",disc = " + 0 + " where item_id = " + id;
                             MySqlCommand disc = new MySqlCommand(dis, hpup);
                             disc.ExecuteNonQuery();
                             return RedirectToAction("AcList");
@@ -1410,18 +1400,25 @@ namespace hpl.Controllers
                     using (MySqlConnection hpup = new MySqlConnection(hp))
                     {
                         using (MySqlCommand cmd = hpup.CreateCommand())
-                        {
+                        {//入札商品最高額取得
                             hpup.Open();
-                            cmd.CommandText = $"select user_id,max(money) from bid where item_id = " + id;
+                            cmd.CommandText = $"SELECT user_id,money FROM bid WHERE money = (SELECT Max(money) FROM bid where item_id = " + id + ")";
                             MySqlDataReader reader = cmd.ExecuteReader();
                             reader.Read();
                             age = int.Parse(reader["user_id"].ToString());
-                            maxprice = int.Parse(reader["max(money)"].ToString());
+                            maxprice = int.Parse(reader["money"].ToString());
                             reader.Close();
 
-                            if (bidprice > maxprice)//入札商品最高額取得
+                            if (bidprice > maxprice)
                             {
-                                cmd.CommandText = $"update bid set money = " + bidprice + " where (user_id = " + Session["loginid"] + ") and (item_id = " + id + " )";
+                                for (i = maxprice; i < bidprice; i+=100)
+                                {
+                                    price = i;
+                                }
+                                cmd.CommandText = $"update exhibit set money = " + price + " where item_id = " + id;
+                                cmd.ExecuteNonQuery();
+
+                                cmd.CommandText = $"update bid set money = " + price + " where (user_id = " + Session["loginid"] + ") and (item_id = " + id + " )";
                                 cmd.ExecuteNonQuery();
                             }
                             else if (bidprice < maxprice)
@@ -1429,6 +1426,10 @@ namespace hpl.Controllers
                                 cmd.CommandText = $"update exhibit set money = " + bidprice + "+" + 100 + " where item_id = " + id;
                                 cmd.ExecuteNonQuery();
                                 return RedirectToAction("AcList");
+                            }
+                            else if (bidprice == maxprice)
+                            {
+
                             }
                         }
                     }
@@ -1444,7 +1445,7 @@ namespace hpl.Controllers
                     using (MySqlCommand cmd = hpup.CreateCommand())
                     {
                         hpup.Open();
-                        cmd.CommandText = $"update exhibit set money = " + int.Parse(money) + "+" + 100 + " where item_id = " + id;
+                        cmd.CommandText = $"insert ignore into bid (item_id,user_id,money,lastprice,time,lasttime) values(" + id + "," + int.Parse(Session["loginid"].ToString()) + ",'" + bidprice + "','" + lastprice + "','" + nowtime + "','" + lasttime + "')";
                         cmd.ExecuteNonQuery();
                         return RedirectToAction("AcList");
                     }

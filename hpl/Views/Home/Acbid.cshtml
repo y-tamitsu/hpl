@@ -109,6 +109,7 @@
                             @*モーダルのボディ*@
                             <div class="modal-body">
                                 <div class="money">
+                                    現在価格：@ViewBag.money<br>
                                     @Html.LabelFor(model => model.money, htmlAttributes: new { @class = "text-center" })：@ViewBag.bider
                                     <input type="text" name="bidprice" id="bidprice" placeholder="入札希望額" style="right:50%" class="text-center" required>
                                 </div>
